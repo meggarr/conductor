@@ -45,6 +45,11 @@ public class PostgresMetadataDAO extends PostgresBaseDAO implements MetadataDAO,
 
     private final ScheduledExecutorService scheduledExecutorService;
 
+    // calix
+    private static final TaskDef DEFAULT = new TaskDef();
+
+    // end calix
+
     public PostgresMetadataDAO(
             RetryTemplate retryTemplate,
             ObjectMapper objectMapper,
@@ -56,8 +61,10 @@ public class PostgresMetadataDAO extends PostgresBaseDAO implements MetadataDAO,
         this.scheduledExecutorService =
                 Executors.newSingleThreadScheduledExecutor(
                         ExecutorsUtil.newNamedThreadFactory("postgres-metadata-"));
+        // calix
         this.scheduledExecutorService.scheduleWithFixedDelay(
-                this::refreshTaskDefs, cacheRefreshTime, cacheRefreshTime, TimeUnit.SECONDS);
+                this::refreshTaskDefs, 10, cacheRefreshTime, TimeUnit.SECONDS);
+        // end calix
     }
 
     @PreDestroy
@@ -102,9 +109,13 @@ public class PostgresMetadataDAO extends PostgresBaseDAO implements MetadataDAO,
                 logger.trace("Cache miss: {}", name);
             }
             taskDef = getTaskDefFromDB(name);
+            // calix
+            taskDefCache.put(name, null == taskDef ? DEFAULT : taskDef);
+            // end calix
         }
-
-        return taskDef;
+        // calix
+        return DEFAULT.equals(taskDef) ? null : taskDef;
+        // end calix
     }
 
     @Override

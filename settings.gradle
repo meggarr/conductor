@@ -38,10 +38,14 @@ include 'core'
 include 'client'
 include 'client-spring'
 
-include 'cassandra-persistence'
+// calix
+// include 'cassandra-persistence'
+// end calix
 include 'redis-persistence'
 
-include 'es6-persistence'
+// calix
+// include 'es6-persistence'
+// end calix
 
 include 'redis-lock'
 
@@ -54,9 +58,11 @@ include 'json-jq-task'
 include 'http-task'
 
 include 'rest'
-include 'grpc'
-include 'grpc-server'
-include 'grpc-client'
+// calix
+// include 'grpc'
+// include 'grpc-server'
+// include 'grpc-client'
+// end calix
 
 include 'java-sdk'
 
@@ -65,11 +71,15 @@ include 'workflow-event-listener'
 include 'test-util'
 include 'kafka'
 include 'common-persistence'
-include 'mysql-persistence'
+// calix
+// include 'mysql-persistence'
+// end calix
 include 'postgres-persistence'
 include 'metrics'
 include 'es7-persistence'
-include 'azureblob-storage'
+// calix
+// include 'azureblob-storage'
+// end calix
 include 'postgres-external-storage'
 include 'amqp'
 include 'nats'

@@ -14,10 +14,14 @@ package com.netflix.conductor.core.operation;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -29,6 +33,7 @@ import com.netflix.conductor.core.event.WorkflowCreationEvent;
 import com.netflix.conductor.core.event.WorkflowEvaluationEvent;
 import com.netflix.conductor.core.exception.TransientException;
 import com.netflix.conductor.core.execution.StartWorkflowInput;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.core.metadata.MetadataMapperService;
 import com.netflix.conductor.core.utils.IDGenerator;
 import com.netflix.conductor.core.utils.ParametersUtils;
@@ -48,6 +53,13 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
     private final ExecutionLockService executionLockService;
     private final ApplicationEventPublisher eventPublisher;
 
+    // calix
+    @Autowired
+    @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_START)
+    private Executor asyncStart;
+
+    // end calix
+
     public StartWorkflowOperation(
             MetadataMapperService metadataMapperService,
             IDGenerator idGenerator,
@@ -65,16 +77,31 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
 
     @Override
     public String execute(StartWorkflowInput input) {
+        // calix
+        return startWorkflow(input).getWorkflowId();
+        // end calix
+    }
+
+    // calix
+    public WorkflowModel start(StartWorkflowInput input) {
         return startWorkflow(input);
     }
+
+    // end calix
 
     @EventListener(WorkflowCreationEvent.class)
     public void handleWorkflowCreationEvent(WorkflowCreationEvent workflowCreationEvent) {
         startWorkflow(workflowCreationEvent.getStartWorkflowInput());
     }
 
-    private String startWorkflow(StartWorkflowInput input) {
+    // calix
+    private WorkflowModel startWorkflow(StartWorkflowInput input) {
+        // end calix
         WorkflowDef workflowDefinition;
+
+        // calix
+        long s = Monitors.now();
+        // end calix
 
         if (input.getWorkflowDefinition() == null) {
             workflowDefinition =
@@ -83,8 +110,15 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
         } else {
             workflowDefinition = input.getWorkflowDefinition();
         }
+        // calix
+        s = Monitors.recordWorkflowStartDuration(workflowDefinition.getName(), "wf_def", s);
+        // end calix
 
         workflowDefinition = metadataMapperService.populateTaskDefinitions(workflowDefinition);
+
+        // calix
+        s = Monitors.recordWorkflowStartDuration(workflowDefinition.getName(), "task_def", s);
+        // end calix
 
         // perform validations
         Map<String, Object> workflowInput = input.getWorkflowInput();
@@ -126,7 +160,10 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
                     workflow.getWorkflowName(),
                     String.valueOf(workflow.getWorkflowVersion()),
                     workflow.getOwnerApp());
-            return workflowId;
+            // calix
+            Monitors.recordWorkflowStartDuration(workflowDefinition.getName(), "create_eval", s);
+            return workflow;
+            // end calix
         } catch (Exception e) {
             Monitors.recordWorkflowStartError(
                     workflowDefinition.getName(), WorkflowContext.get().getClientApp());
@@ -151,17 +188,31 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
         if (!executionLockService.acquireLock(workflow.getWorkflowId())) {
             throw new TransientException("Error acquiring lock when creating workflow: {}");
         }
+        // calix
+        long s = Monitors.now();
+        // end calix
         try {
             executionDAOFacade.createWorkflow(workflow);
+            // calix
+            Monitors.recordWorkflowStartDuration(workflow.getWorkflowName(), "create_create", s);
+            // end calix
             LOGGER.debug(
                     "A new instance of workflow: {} created with id: {}",
                     workflow.getWorkflowName(),
                     workflow.getWorkflowId());
             executionDAOFacade.populateWorkflowAndTaskPayloadData(workflow);
-            eventPublisher.publishEvent(new WorkflowEvaluationEvent(workflow));
+            // calix
+            // eventPublisher.publishEvent(new WorkflowEvaluationEvent(workflow));
+            // end calix
         } finally {
             executionLockService.releaseLock(workflow.getWorkflowId());
         }
+        // calix
+        CompletableFuture.runAsync(
+                () -> eventPublisher.publishEvent(new WorkflowEvaluationEvent(workflow)),
+                asyncStart);
+        // end calix
+
     }
 
     /**

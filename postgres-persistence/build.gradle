@@ -21,7 +21,9 @@ dependencies {
 
     testImplementation project(':conductor-server')
     testImplementation project(':conductor-client')
-    testImplementation project(':conductor-grpc-client')
+    // calix
+    // testImplementation project(':conductor-grpc-client')
+    // end calix
     testImplementation project(':conductor-es7-persistence')
 
     testImplementation "org.testcontainers:postgresql:${revTestContainer}"

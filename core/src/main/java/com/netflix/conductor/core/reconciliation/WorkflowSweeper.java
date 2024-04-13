@@ -12,13 +12,13 @@
  */
 package com.netflix.conductor.core.reconciliation;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -30,11 +30,13 @@ import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.core.dal.ExecutionDAOFacade;
 import com.netflix.conductor.core.exception.NotFoundException;
 import com.netflix.conductor.core.execution.WorkflowExecutor;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.dao.QueueDAO;
 import com.netflix.conductor.metrics.Monitors;
 import com.netflix.conductor.model.TaskModel;
 import com.netflix.conductor.model.TaskModel.Status;
 import com.netflix.conductor.model.WorkflowModel;
+import com.netflix.conductor.service.ExecutionLockService;
 
 import static com.netflix.conductor.core.config.SchedulerConfiguration.SWEEPER_EXECUTOR_NAME;
 import static com.netflix.conductor.core.utils.Utils.DECIDER_QUEUE;
@@ -51,6 +53,11 @@ public class WorkflowSweeper {
     private final ExecutionDAOFacade executionDAOFacade;
 
     private static final String CLASS_NAME = WorkflowSweeper.class.getSimpleName();
+
+    // calix
+    @Autowired private ExecutionLockService lockService;
+
+    // end calix
 
     public WorkflowSweeper(
             WorkflowExecutor workflowExecutor,
@@ -75,18 +82,30 @@ public class WorkflowSweeper {
     public void sweep(String workflowId) {
         WorkflowModel workflow = null;
         try {
+            // calix
+            lockService.deleteLock(WorkflowExternalBeans.lockedQueue(workflowId));
+            // end calix
             WorkflowContext workflowContext = new WorkflowContext(properties.getAppId());
             WorkflowContext.set(workflowContext);
             LOGGER.debug("Running sweeper for workflow {}", workflowId);
 
-            workflow = executionDAOFacade.getWorkflowModel(workflowId, true);
+            // calix
+            // workflow = executionDAOFacade.getWorkflowModel(workflowId, true);
+            // end calix
 
             if (workflowRepairService != null) {
+                // calix
+                workflow = executionDAOFacade.getWorkflowModel(workflowId, true);
+                // end calix
                 // Verify and repair tasks in the workflow.
                 workflowRepairService.verifyAndRepairWorkflowTasks(workflow);
             }
 
-            workflow = workflowExecutor.decideWithLock(workflow);
+            // calix
+            // workflow = workflowExecutor.decideWithLock(workflow);
+            workflow = workflowExecutor.decide(workflowId);
+            if (workflowExecutor.locked(workflow, workflowId)) return;
+            // end calix
             if (workflow != null && workflow.getStatus().isTerminal()) {
                 queueDAO.remove(DECIDER_QUEUE, workflowId);
                 return;
@@ -104,15 +123,21 @@ public class WorkflowSweeper {
         long workflowOffsetTimeout =
                 workflowOffsetWithJitter(properties.getWorkflowOffsetTimeout().getSeconds());
         if (workflow != null) {
-            long startTime = Instant.now().toEpochMilli();
+            // calix
+            // long startTime = Instant.now().toEpochMilli();
             unack(workflow, workflowOffsetTimeout);
-            long endTime = Instant.now().toEpochMilli();
-            Monitors.recordUnackTime(workflow.getWorkflowName(), endTime - startTime);
+            // long endTime = Instant.now().toEpochMilli();
+            // Monitors.recordUnackTime(workflow.getWorkflowName(),endTime - startTime);
+            // end calix
         } else {
             LOGGER.warn(
                     "Workflow with {} id can not be found. Attempting to unack using the id",
                     workflowId);
-            queueDAO.setUnackTimeout(DECIDER_QUEUE, workflowId, workflowOffsetTimeout * 1000);
+            // calix
+            // queueDAO.setUnackTimeout(DECIDER_QUEUE,workflowId,workflowOffsetTimeout * 1000);
+            lock(workflowId, "NO_FOUND", workflowOffsetTimeout);
+            // end calix
+
         }
     }
 
@@ -161,8 +186,16 @@ public class WorkflowSweeper {
                 break;
             }
         }
+        // calix
+        /*
         queueDAO.setUnackTimeout(
                 DECIDER_QUEUE, workflowModel.getWorkflowId(), postponeDurationSeconds * 1000);
+         */
+        lock(
+                workflowModel.getWorkflowId(),
+                workflowModel.getWorkflowName(),
+                postponeDurationSeconds);
+        // end calix
     }
 
     /**
@@ -178,4 +211,31 @@ public class WorkflowSweeper {
         long jitter = new Random().nextInt((int) (2 * range + 1)) - range;
         return workflowOffsetTimeout + jitter;
     }
+
+    // calix
+    private void lock(String workflowId, String name, long timeout) {
+        String lockId = WorkflowExternalBeans.lockedQueue(workflowId);
+        long s = Monitors.now();
+        boolean locked = lockService.acquireLock(lockId, 5, 60000);
+        if (!locked) {
+            LOGGER.debug("Locked {} by other threads", workflowId);
+            return;
+        }
+        try {
+            queueDAO.setUnackTimeout(DECIDER_QUEUE, workflowId, timeout * 1000);
+            LOGGER.debug("Postpone {} s for {}", timeout, workflowId);
+        } catch (Exception e) {
+            LOGGER.error("Un ack failed of {} with {}", workflowId, timeout, e);
+        } finally {
+            lockService.releaseLock(lockId);
+            long t = Monitors.now() - s;
+            Monitors.recordUnackTime(name, t);
+            long te = properties.getWorkflowUnAckLockTimeout().toMillis() - 5;
+            if (t >= te) {
+                LOGGER.error("Un ack {} over {} ms", workflowId, t);
+                queueDAO.push(DECIDER_QUEUE, workflowId, 1);
+            }
+        }
+    }
+    // end calix
 }

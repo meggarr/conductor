@@ -61,6 +61,9 @@ public class AsyncSystemTaskExecutor {
      * @param taskId The id of the {@link TaskModel} object.
      */
     public void execute(WorkflowSystemTask systemTask, String taskId) {
+        // calix
+        long s = Monitors.now();
+        // end calix
         TaskModel task = loadTaskQuietly(taskId);
         if (task == null) {
             LOGGER.error("TaskId: {} could not be found while executing {}", taskId, systemTask);
@@ -88,6 +91,9 @@ public class AsyncSystemTaskExecutor {
             queueDAO.remove(queueName, task.getTaskId());
             return;
         }
+        // calix
+        Monitors.recordWorkflowTaskSys(queueName, "get_tasks", s);
+        // end calix
 
         if (task.getStatus().equals(TaskModel.Status.SCHEDULED)) {
             if (executionDAOFacade.exceedsInProgressLimit(task)) {
@@ -115,9 +121,15 @@ public class AsyncSystemTaskExecutor {
         // if we are here the Task object is updated and needs to be persisted regardless of an
         // exception
         try {
+            // calix
+            s = Monitors.now();
+            // end calix
             WorkflowModel workflow =
                     executionDAOFacade.getWorkflowModel(
                             workflowId, systemTask.isTaskRetrievalRequired());
+            // calix
+            Monitors.recordWorkflowTaskSys(queueName, "get_wf", s);
+            // end calix
 
             if (workflow.getStatus().isTerminal()) {
                 LOGGER.info(
@@ -146,12 +158,21 @@ public class AsyncSystemTaskExecutor {
                 task.incrementPollCount();
             }
 
+            // calix
+            s = Monitors.now();
+            // end calix
             if (task.getStatus() == TaskModel.Status.SCHEDULED) {
                 task.setStartTime(System.currentTimeMillis());
                 Monitors.recordQueueWaitTime(task.getTaskType(), task.getQueueWaitTime());
                 systemTask.start(workflow, task, workflowExecutor);
+                // calix
+                Monitors.recordWorkflowTaskSys(queueName, "task_start", s);
+                // end calix
             } else if (task.getStatus() == TaskModel.Status.IN_PROGRESS) {
                 systemTask.execute(workflow, task, workflowExecutor);
+                // calix
+                Monitors.recordWorkflowTaskSys(queueName, "task_exec", s);
+                // end calix
             }
 
             // Update message in Task queue based on Task status
@@ -187,14 +208,25 @@ public class AsyncSystemTaskExecutor {
             Monitors.error(AsyncSystemTaskExecutor.class.getSimpleName(), "executeSystemTask");
             LOGGER.error("Error executing system task - {}, with id: {}", systemTask, taskId, e);
         } finally {
+            // calix
+            s = Monitors.now();
             executionDAOFacade.updateTask(task);
+            s = Monitors.recordWorkflowTaskSys(queueName, "update_task", s);
+            // end calix
             if (shouldRemoveTaskFromQueue) {
                 queueDAO.remove(queueName, task.getTaskId());
                 LOGGER.debug("{} removed from queue: {}", task, queueName);
+                // calix
+                s = Monitors.recordWorkflowTaskSys(queueName, "queue_rem", s);
+                // end calix
             }
             // if the current task execution has completed, then the workflow needs to be evaluated
             if (hasTaskExecutionCompleted) {
-                workflowExecutor.decide(workflowId);
+                // calix
+                // workflowExecutor.decide(workflowId);
+                workflowExecutor.locked(workflowExecutor.decide(workflowId), workflowId);
+                Monitors.recordWorkflowTaskSys(queueName, "decide", s);
+                // end calix
             }
         }
     }

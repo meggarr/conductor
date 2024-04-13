@@ -541,4 +541,45 @@ public class ConductorProperties {
         props.forEach((key, value) -> map.put(key.toString(), value));
         return map;
     }
+
+    // calix
+    private int asyncDaoThreadCount = Runtime.getRuntime().availableProcessors() * 2;
+    private int asyncListenerThreadCount = Runtime.getRuntime().availableProcessors() * 2;
+    private int asyncStartThreadCount = Runtime.getRuntime().availableProcessors() * 2;
+
+    @DurationUnit(ChronoUnit.MILLIS)
+    private Duration workflowUnAckLockTimeout = Duration.ofMillis(500);
+
+    public int getAsyncDaoThreadCount() {
+        return this.asyncDaoThreadCount;
+    }
+
+    public void setAsyncDaoThreadCount(int asyncDaoThreadCount) {
+        this.asyncDaoThreadCount = asyncDaoThreadCount;
+    }
+
+    public int getAsyncListenerThreadCount() {
+        return this.asyncListenerThreadCount;
+    }
+
+    public void setAsyncListenerThreadCount(int asyncListenerThreadCount) {
+        this.asyncListenerThreadCount = asyncListenerThreadCount;
+    }
+
+    public int getAsyncStartThreadCount() {
+        return this.asyncStartThreadCount;
+    }
+
+    public void setAsyncStartThreadCount(int asyncStartThreadCount) {
+        this.asyncStartThreadCount = asyncStartThreadCount;
+    }
+
+    public Duration getWorkflowUnAckLockTimeout() {
+        return workflowUnAckLockTimeout;
+    }
+
+    public void setWorkflowUnAckLockTimeout(Duration workflowUnAckLockTimeout) {
+        this.workflowUnAckLockTimeout = workflowUnAckLockTimeout;
+    }
+    // end calix
 }

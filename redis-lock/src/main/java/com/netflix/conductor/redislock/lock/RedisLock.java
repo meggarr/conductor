@@ -86,6 +86,13 @@ public class RedisLock implements Lock {
     @Override
     public void deleteLock(String lockId) {
         // Noop for Redlock algorithm as releaseLock / unlock deletes it.
+        // calix
+        try {
+            redisson.getKeys().delete(parseLockId(lockId));
+        } catch (Exception e) {
+            LOGGER.error("Delete lock {} failed", lockId, e);
+        }
+        // end calix
     }
 
     private String parseLockId(String lockId) {

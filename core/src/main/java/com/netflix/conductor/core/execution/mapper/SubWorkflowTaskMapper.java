@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.netflix.conductor.annotations.VisibleForTesting;
+import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.tasks.TaskType;
 import com.netflix.conductor.common.metadata.workflow.SubWorkflowParams;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -83,6 +84,22 @@ public class SubWorkflowTaskMapper implements TaskMapper {
         subWorkflowTask.addInput("workflowInput", taskMapperContext.getTaskInput());
         subWorkflowTask.setStatus(TaskModel.Status.SCHEDULED);
         subWorkflowTask.setCallbackAfterSeconds(workflowTask.getStartDelay());
+
+        // calix
+        if (Objects.nonNull(workflowTask.getName())) {
+            TaskDef taskDefinition =
+                    Optional.ofNullable(taskMapperContext.getTaskDefinition())
+                            .orElseGet(() -> metadataDAO.getTaskDef(workflowTask.getName()));
+            if (Objects.nonNull(taskDefinition)) {
+                subWorkflowTask.setIsolationGroupId(taskDefinition.getIsolationGroupId());
+                LOGGER.debug(
+                        "[Isolated] {} => {}",
+                        subWorkflowTask.getIsolationGroupId(),
+                        workflowTask.getName());
+            }
+        }
+        // end calix
+
         LOGGER.debug("SubWorkflowTask {} created to be Scheduled", subWorkflowTask);
         return List.of(subWorkflowTask);
     }

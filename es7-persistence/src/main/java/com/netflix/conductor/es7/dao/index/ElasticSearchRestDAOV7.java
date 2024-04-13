@@ -1234,8 +1234,10 @@ public class ElasticSearchRestDAOV7 extends ElasticSearchBaseDAO implements Inde
         indexObject(index, docType, null, doc);
     }
 
-    private void indexObject(
+    // calix
+    private synchronized void indexObject(
             final String index, final String docType, final String docId, final Object doc) {
+        // end calix
 
         byte[] docBytes;
         try {

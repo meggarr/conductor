@@ -85,7 +85,10 @@ public class SubWorkflow extends WorkflowSystemTask {
             startWorkflowInput.setParentWorkflowTaskId(task.getTaskId());
             startWorkflowInput.setTaskToDomain(taskToDomain);
 
-            String subWorkflowId = startWorkflowOperation.execute(startWorkflowInput);
+            // calix
+            WorkflowModel subWorkflow = startWorkflowOperation.start(startWorkflowInput);
+            String subWorkflowId = subWorkflow.getWorkflowId();
+            // end calix
 
             task.setSubWorkflowId(subWorkflowId);
             // For backwards compatibility
@@ -93,7 +96,9 @@ public class SubWorkflow extends WorkflowSystemTask {
 
             // Set task status based on current sub-workflow status, as the status can change in
             // recursion by the time we update here.
-            WorkflowModel subWorkflow = workflowExecutor.getWorkflow(subWorkflowId, false);
+            // calix
+            // WorkflowModel subWorkflow = workflowExecutor.getWorkflow(subWorkflowId, false);
+            // end calix
             updateTaskStatus(subWorkflow, task);
         } catch (TransientException te) {
             LOGGER.info(
@@ -118,6 +123,12 @@ public class SubWorkflow extends WorkflowSystemTask {
             WorkflowModel workflow, TaskModel task, WorkflowExecutor workflowExecutor) {
         String workflowId = task.getSubWorkflowId();
         if (StringUtils.isEmpty(workflowId)) {
+            LOGGER.error(
+                    "update parent {} sub {} task {} status {} null id",
+                    workflow.getParentWorkflowId(),
+                    workflow.getWorkflowId(),
+                    task.getTaskId(),
+                    workflow.getStatus());
             return false;
         }
 

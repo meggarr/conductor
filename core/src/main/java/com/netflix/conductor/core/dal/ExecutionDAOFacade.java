@@ -495,6 +495,9 @@ public class ExecutionDAOFacade {
      *     payload fails.
      */
     public void updateTask(TaskModel taskModel) {
+        // calix
+        long s = Monitors.now();
+        // end calix
         if (taskModel.getStatus() != null) {
             if (!taskModel.getStatus().isTerminal()
                     || (taskModel.getStatus().isTerminal() && taskModel.getUpdateTime() == 0)) {
@@ -526,6 +529,10 @@ public class ExecutionDAOFacade {
                             taskModel.getTaskId(), taskModel.getWorkflowInstanceId());
             LOGGER.error(errorMsg, e);
             throw new TransientException(errorMsg, e);
+        } finally {
+            // calix
+            Monitors.recordTaskUpdateDuration(taskModel.getTaskType(), s);
+            // end calix
         }
     }
 

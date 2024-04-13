@@ -13,13 +13,18 @@
 package com.netflix.conductor.core.execution;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -42,6 +47,7 @@ import com.netflix.conductor.core.exception.*;
 import com.netflix.conductor.core.execution.tasks.SystemTaskRegistry;
 import com.netflix.conductor.core.execution.tasks.Terminate;
 import com.netflix.conductor.core.execution.tasks.WorkflowSystemTask;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.core.listener.TaskStatusListener;
 import com.netflix.conductor.core.listener.WorkflowStatusListener;
 import com.netflix.conductor.core.metadata.MetadataMapperService;
@@ -92,6 +98,15 @@ public class WorkflowExecutor {
             pollData ->
                     pollData.getLastPollTime()
                             > System.currentTimeMillis() - activeWorkerLastPollMs;
+
+    // calix
+    public static final WorkflowModel LOCKED = new WorkflowModel();
+
+    @Autowired
+    @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_LISTENER)
+    private Executor asyncListener;
+
+    // end calix
 
     public WorkflowExecutor(
             DeciderService deciderService,
@@ -506,6 +521,9 @@ public class WorkflowExecutor {
      */
     @VisibleForTesting
     WorkflowModel completeWorkflow(WorkflowModel workflow) {
+        // calix
+        long s = Monitors.now();
+        // end calix
         LOGGER.debug("Completing workflow execution for {}", workflow.getWorkflowId());
 
         if (workflow.getStatus().equals(WorkflowModel.Status.COMPLETED)) {
@@ -513,6 +531,9 @@ public class WorkflowExecutor {
             executionDAOFacade.removeFromPendingWorkflow(
                     workflow.getWorkflowName(), workflow.getWorkflowId());
             LOGGER.debug("Workflow: {} has already been completed.", workflow.getWorkflowId());
+            // calix
+            Monitors.recordWorkflowComplete(workflow.getWorkflowName(), "completed_sweep", s);
+            // end calix
             return workflow;
         }
 
@@ -550,7 +571,12 @@ public class WorkflowExecutor {
 
         executionDAOFacade.updateWorkflow(workflow);
         LOGGER.debug("Completed workflow execution for {}", workflow.getWorkflowId());
-        workflowStatusListener.onWorkflowCompletedIfEnabled(workflow);
+        // calix
+        // workflowStatusListener.onWorkflowCompletedIfEnabled(workflow);
+        CompletableFuture.runAsync(
+                () -> workflowStatusListener.onWorkflowCompletedIfEnabled(workflow), asyncListener);
+        s = Monitors.recordWorkflowComplete(workflow.getWorkflowName(), "completed", s);
+        // end calix
         Monitors.recordWorkflowCompletion(
                 workflow.getWorkflowName(),
                 workflow.getEndTime() - workflow.getCreateTime(),
@@ -564,10 +590,20 @@ public class WorkflowExecutor {
                     workflow.getParentWorkflowId(),
                     workflow.getParentWorkflowTaskId());
             expediteLazyWorkflowEvaluation(workflow.getParentWorkflowId());
+            // calix
+            s = Monitors.recordWorkflowComplete(workflow.getWorkflowName(), "completed_parent", s);
+            // end calix
         }
 
+        // calix
+        executionLockService.deleteLock(
+                WorkflowExternalBeans.lockedQueue(workflow.getWorkflowId()));
+        // end calix
         executionLockService.releaseLock(workflow.getWorkflowId());
         executionLockService.deleteLock(workflow.getWorkflowId());
+        // calix
+        Monitors.recordWorkflowComplete(workflow.getWorkflowName(), "completed_locks", s);
+        // end calix
         return workflow;
     }
 
@@ -883,7 +919,9 @@ public class WorkflowExecutor {
         }
 
         if (!isLazyEvaluateWorkflow(workflowInstance.getWorkflowDefinition(), task)) {
-            decide(workflowId);
+            // calix
+            this.locked(decide(workflowId), workflowId);
+            // end calix
         }
     }
 
@@ -1013,7 +1051,10 @@ public class WorkflowExecutor {
 
     @EventListener(WorkflowEvaluationEvent.class)
     public void handleWorkflowEvaluationEvent(WorkflowEvaluationEvent wee) {
-        decide(wee.getWorkflowModel());
+        // calix
+        WorkflowModel w = wee.getWorkflowModel();
+        locked(decideWithLock(w), w.getWorkflowId());
+        // end calix
     }
 
     /** Records a metric for the "decide" process. */
@@ -1021,21 +1062,38 @@ public class WorkflowExecutor {
         StopWatch watch = new StopWatch();
         watch.start();
         if (!executionLockService.acquireLock(workflowId)) {
-            return null;
+            // calix
+            // return null;
+            LOGGER.debug("locked failed {}", workflowId);
+            return LOCKED;
+            // end calix
         }
+        // calix
+        long s = Monitors.now();
+        WorkflowModel workflow = null;
+        // end calix
         try {
 
-            WorkflowModel workflow = executionDAOFacade.getWorkflowModel(workflowId, true);
+            workflow = executionDAOFacade.getWorkflowModel(workflowId, true);
             if (workflow == null) {
                 // This can happen if the workflowId is incorrect
                 return null;
             }
-            return decide(workflow);
+            // calix
+            s = Monitors.recordWorkflowDecision(workflow.getWorkflowName(), "decision_wf_get", s);
+            WorkflowModel w = decide(workflow);
+            Monitors.recordWorkflowDecision(workflow.getWorkflowName(), "decision_wf_decide", s);
+            LOGGER.debug("Decided {} ok", workflowId);
+            return w;
+            // end calix
 
         } finally {
             executionLockService.releaseLock(workflowId);
             watch.stop();
-            Monitors.recordWorkflowDecisionTime(watch.getTime());
+            // calix
+            Monitors.recordWorkflowDecisionTime(
+                    null == workflow ? "NOT_FOUND" : workflow.getWorkflowName(), watch.getTime());
+            // end calix
         }
     }
 
@@ -1053,7 +1111,9 @@ public class WorkflowExecutor {
         StopWatch watch = new StopWatch();
         watch.start();
         if (!executionLockService.acquireLock(workflow.getWorkflowId())) {
-            return null;
+            // calix
+            return LOCKED;
+            // end calix
         }
         try {
             return decide(workflow);
@@ -1061,7 +1121,9 @@ public class WorkflowExecutor {
         } finally {
             executionLockService.releaseLock(workflow.getWorkflowId());
             watch.stop();
-            Monitors.recordWorkflowDecisionTime(watch.getTime());
+            // calix
+            Monitors.recordWorkflowDecisionTime(workflow.getWorkflowName(), watch.getTime());
+            // end calix
         }
     }
 
@@ -1083,8 +1145,17 @@ public class WorkflowExecutor {
         // and change the workflow/task state accordingly
         adjustStateIfSubWorkflowChanged(workflow);
 
+        // calix
+        long s = Monitors.now();
+        // end calix
+
         try {
             DeciderService.DeciderOutcome outcome = deciderService.decide(workflow);
+            // calix
+            s =
+                    Monitors.recordWorkflowDecision(
+                            workflow.getWorkflowName(), "decision_svc_decide", s);
+            // end calix
             if (outcome.isComplete) {
                 endExecution(workflow, outcome.terminateTask);
                 return workflow;
@@ -1097,6 +1168,11 @@ public class WorkflowExecutor {
             tasksToBeScheduled = dedupAndAddTasks(workflow, tasksToBeScheduled);
 
             boolean stateChanged = scheduleTask(workflow, tasksToBeScheduled); // start
+            // calix
+            s =
+                    Monitors.recordWorkflowDecision(
+                            workflow.getWorkflowName(), "decision_task_scheduled", s);
+            // end calix
 
             for (TaskModel task : outcome.tasksToBeScheduled) {
                 executionDAOFacade.populateTaskData(task);
@@ -1112,17 +1188,37 @@ public class WorkflowExecutor {
                 }
             }
 
+            // calix
+            s =
+                    Monitors.recordWorkflowDecision(
+                            workflow.getWorkflowName(), "decision_sys_task_executed", s);
+            // end calix
+
             if (!outcome.tasksToBeUpdated.isEmpty() || !tasksToBeScheduled.isEmpty()) {
                 executionDAOFacade.updateTasks(tasksToBeUpdated);
             }
 
+            // calix
+            s =
+                    Monitors.recordWorkflowDecision(
+                            workflow.getWorkflowName(), "decision_tasks_update", s);
+            // end calix
+
             if (stateChanged) {
-                return decide(workflow);
+                // calix
+                WorkflowModel w = decide(workflow);
+                Monitors.recordWorkflowDecision(
+                        workflow.getWorkflowName(), "decision_changed_decide", s);
+                return w;
+                // end calix
             }
 
             if (!outcome.tasksToBeUpdated.isEmpty() || !tasksToBeScheduled.isEmpty()) {
                 executionDAOFacade.updateWorkflow(workflow);
             }
+            // calix
+            Monitors.recordWorkflowDecision(workflow.getWorkflowName(), "decision_wf_update", s);
+            // end calix
 
             return workflow;
 
@@ -1799,8 +1895,28 @@ public class WorkflowExecutor {
 
     @VisibleForTesting
     void updateParentWorkflowTask(WorkflowModel subWorkflow) {
+        // calix
+        TaskModel subWorkflowTask;
+        /*
         TaskModel subWorkflowTask =
                 executionDAOFacade.getTaskModel(subWorkflow.getParentWorkflowTaskId());
+         */
+        do {
+            subWorkflowTask =
+                    executionDAOFacade.getTaskModel(subWorkflow.getParentWorkflowTaskId());
+            if (Strings.isNotBlank(subWorkflowTask.getSubWorkflowId())) break;
+            try {
+                LOGGER.debug(
+                        "Waiting for parent {} task {} updated of {}",
+                        subWorkflow.getParentWorkflowId(),
+                        subWorkflow.getParentWorkflowTaskId(),
+                        subWorkflow.getWorkflowId());
+                Thread.sleep(200);
+            } catch (Exception e) {
+                LOGGER.error("Interrupted", e);
+            }
+        } while (true);
+        // end calix
         executeSubworkflowTaskAndSyncData(subWorkflow, subWorkflowTask);
         executionDAOFacade.updateTask(subWorkflowTask);
     }
@@ -1818,11 +1934,25 @@ public class WorkflowExecutor {
      * @param workflowId The workflow to be evaluated at higher priority
      */
     private void expediteLazyWorkflowEvaluation(String workflowId) {
+        // calix
+        /*
         if (queueDAO.containsMessage(DECIDER_QUEUE, workflowId)) {
             queueDAO.postpone(DECIDER_QUEUE, workflowId, EXPEDITED_PRIORITY, 0);
         } else {
             queueDAO.push(DECIDER_QUEUE, workflowId, EXPEDITED_PRIORITY, 0);
+        }*/
+
+        String queue = WorkflowExternalBeans.lockedQueue(workflowId);
+        long wait = properties.getWorkflowUnAckLockTimeout().toMillis();
+        long lease = 600000;
+        boolean locked = executionLockService.acquireLock(queue, wait, lease);
+        if (!locked) {
+            LOGGER.debug("Locked {} ms by other threads", workflowId);
+            locked = executionLockService.acquireLock(queue, 5, lease);
+            if (!locked) return;
         }
+        queueDAO.postpone(DECIDER_QUEUE, workflowId, EXPEDITED_PRIORITY, 0);
+        // end calix
 
         LOGGER.info("Pushed workflow {} to {} for expedited evaluation", workflowId, DECIDER_QUEUE);
     }
@@ -1836,4 +1966,12 @@ public class WorkflowExecutor {
                                         && !t.getWorkflowTask().isOptional()
                                         && t.getStatus().equals(FAILED));
     }
+
+    // calix
+    public boolean locked(WorkflowModel w, String workflowId) {
+        if (!LOCKED.equals(w)) return false;
+        expediteLazyWorkflowEvaluation(workflowId);
+        return true;
+    }
+    // end calix
 }

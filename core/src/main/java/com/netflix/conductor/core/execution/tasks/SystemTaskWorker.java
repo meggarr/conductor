@@ -86,6 +86,9 @@ public class SystemTaskWorker extends LifecycleAwareComponent {
     }
 
     void pollAndExecute(WorkflowSystemTask systemTask, String queueName) {
+        // calix
+        long start = Monitors.now();
+        // end calix
         if (!isRunning()) {
             LOGGER.debug(
                     "{} stopped. Not polling for task: {}", getClass().getSimpleName(), systemTask);
@@ -108,7 +111,9 @@ public class SystemTaskWorker extends LifecycleAwareComponent {
 
             LOGGER.debug("Polling queue: {} with {} slots acquired", queueName, messagesToAcquire);
 
+            long s = Monitors.now();
             List<String> polledTaskIds = queueDAO.pop(queueName, messagesToAcquire, 200);
+            Monitors.recordWorkflowTaskSys(queueName, "sys_pop", s);
 
             Monitors.recordTaskPoll(queueName);
             LOGGER.debug("Polling queue:{}, got {} tasks", queueName, polledTaskIds.size());
@@ -128,12 +133,22 @@ public class SystemTaskWorker extends LifecycleAwareComponent {
                                 queueName);
                         Monitors.recordTaskPollCount(queueName, 1);
 
-                        executionService.ackTaskReceived(taskId);
+                        // calix
+                        // executionService.ackTaskReceived(taskId);
 
                         CompletableFuture<Void> taskCompletableFuture =
                                 CompletableFuture.runAsync(
-                                        () -> asyncSystemTaskExecutor.execute(systemTask, taskId),
+                                        () -> {
+                                            long se = Monitors.now();
+                                            executionService.ackTaskReceived(queueName, taskId);
+                                            se =
+                                                    Monitors.recordWorkflowTaskSys(
+                                                            queueName, "ack", se);
+                                            asyncSystemTaskExecutor.execute(systemTask, taskId);
+                                            Monitors.recordWorkflowTaskSys(queueName, "exec", se);
+                                        },
                                         executorService);
+                        // end calix
 
                         // release permit after processing is complete
                         taskCompletableFuture.whenComplete(
@@ -152,6 +167,10 @@ public class SystemTaskWorker extends LifecycleAwareComponent {
             semaphoreUtil.completeProcessing(messagesToAcquire);
             Monitors.recordTaskPollError(taskName, e.getClass().getSimpleName());
             LOGGER.error("Error polling system task in queue:{}", queueName, e);
+        } finally {
+            // calix
+            Monitors.recordWorkflowTaskSys(queueName, "sync_exec", start);
+            // end calix
         }
     }
 

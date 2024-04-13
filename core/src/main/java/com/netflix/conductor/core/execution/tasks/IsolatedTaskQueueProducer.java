@@ -111,7 +111,13 @@ public class IsolatedTaskQueueProducer {
                                 isolatedTaskDef.getIsolationGroupId(),
                                 isolatedTaskDef.getExecutionNameSpace());
                 LOGGER.debug("Adding taskQueue:'{}' to system task worker coordinator", taskQueue);
-                if (!listeningQueues.contains(taskQueue)) {
+                // calix
+                if (!listeningQueues.contains(taskQueue)
+                        && (StringUtils.isEmpty(isolatedTaskDef.getDescription())
+                                || systemTask
+                                        .getTaskType()
+                                        .equals(isolatedTaskDef.getDescription()))) {
+                    // end calix
                     systemTaskWorker.startPolling(systemTask, taskQueue);
                     listeningQueues.add(taskQueue);
                 }

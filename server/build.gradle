@@ -18,7 +18,9 @@ plugins {
 dependencies {
     implementation project(':conductor-core')
     implementation project(':conductor-rest')
-    implementation project(':conductor-grpc-server')
+    // calix
+    // implementation project(':conductor-grpc-server')
+    // end calix
 
     //Event Systems
     implementation project(':conductor-amqp')
@@ -27,16 +29,22 @@ dependencies {
     implementation project(':conductor-awssqs-event-queue')
 
     //External Payload Storage
-    implementation project(':conductor-azureblob-storage')
+    // calix
+    // implementation project(':conductor-azureblob-storage')
+    // end calix
     implementation project(':conductor-postgres-external-storage')
     implementation project(':conductor-awss3-storage')
 
 
     //Persistence
     implementation project(':conductor-redis-persistence')
-    implementation project(':conductor-cassandra-persistence')
+    // calix
+    // implementation project(':conductor-cassandra-persistence')
+    // end calix
     implementation project(':conductor-postgres-persistence')
-    implementation project(':conductor-mysql-persistence')
+    // calix
+    // implementation project(':conductor-mysql-persistence')
+    // end calix
 
     //Indexing (note: Elasticsearch 6 is deprecated)
     implementation project(':conductor-es7-persistence')
@@ -68,9 +76,12 @@ dependencies {
     implementation "org.postgresql:postgresql:${revPostgres}"
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation ("io.orkes.queues:orkes-conductor-queues:${revOrkesQueues}") {
-    	exclude group: 'com.netflix.conductor', module: 'conductor-core'
-    }
+    // calix
+    // implementation ("io.orkes.queues:orkes-conductor-queues:${revOrkesQueues}") {
+    // 	exclude group: 'com.netflix.conductor', module: 'conductor-core'
+    //}
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // end calix
 
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${revSpringDoc}"
 

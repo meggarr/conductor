@@ -13,12 +13,16 @@
 package com.netflix.conductor.service;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.netflix.conductor.annotations.Trace;
@@ -35,6 +39,7 @@ import com.netflix.conductor.core.events.queue.Message;
 import com.netflix.conductor.core.exception.NotFoundException;
 import com.netflix.conductor.core.execution.WorkflowExecutor;
 import com.netflix.conductor.core.execution.tasks.SystemTaskRegistry;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.core.listener.TaskStatusListener;
 import com.netflix.conductor.core.utils.QueueUtils;
 import com.netflix.conductor.core.utils.Utils;
@@ -60,6 +65,13 @@ public class ExecutionService {
     private static final int MAX_POLL_TIMEOUT_MS = 5000;
     private static final int POLL_COUNT_ONE = 1;
     private static final int POLLING_TIMEOUT_IN_MS = 100;
+
+    // calix
+    @Autowired
+    @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_DAO)
+    private Executor daoExecutor;
+
+    // end calix
 
     public ExecutionService(
             WorkflowExecutor workflowExecutor,
@@ -106,7 +118,10 @@ public class ExecutionService {
         String queueName = QueueUtils.getQueueName(taskType, domain, null, null);
 
         List<String> taskIds = new LinkedList<>();
-        List<Task> tasks = new LinkedList<>();
+        // calix
+        // List<Task> tasks = new LinkedList<>();
+        List<Task> tasks = Collections.synchronizedList(new LinkedList<>());
+        // end calix
         try {
             taskIds = queueDAO.pop(queueName, count, timeoutInMilliSecond);
         } catch (Exception e) {
@@ -121,6 +136,123 @@ public class ExecutionService {
             Monitors.recordTaskPollError(taskType, domain, e.getClass().getSimpleName());
         }
 
+        // calix
+        taskIds.stream()
+                .map(
+                        taskId ->
+                                CompletableFuture.runAsync(
+                                        () -> {
+                                            // calix
+                                            long s = Monitors.now();
+                                            TaskModel taskModel = null;
+                                            try {
+                                                taskModel = executionDAOFacade.getTaskModel(taskId);
+                                                // end calix
+                                                if (taskModel == null
+                                                        || taskModel.getStatus().isTerminal()) {
+                                                    // Remove taskId(s) without a valid
+                                                    // Task/terminal state task from the queue
+                                                    queueDAO.remove(queueName, taskId);
+                                                    LOGGER.debug(
+                                                            "Removed task: {} from the queue: {}",
+                                                            taskId,
+                                                            queueName);
+                                                    return;
+                                                }
+
+                                                if (executionDAOFacade.exceedsInProgressLimit(
+                                                        taskModel)) {
+                                                    // Postpone this message, so that it would be
+                                                    // available for poll again.
+                                                    queueDAO.postpone(
+                                                            queueName,
+                                                            taskId,
+                                                            taskModel.getWorkflowPriority(),
+                                                            queueTaskMessagePostponeSecs);
+                                                    LOGGER.debug(
+                                                            "Postponed task: {} in queue: {} by {} seconds",
+                                                            taskId,
+                                                            queueName,
+                                                            queueTaskMessagePostponeSecs);
+                                                    return;
+                                                }
+                                                TaskDef taskDef =
+                                                        taskModel.getTaskDefinition().isPresent()
+                                                                ? taskModel
+                                                                        .getTaskDefinition()
+                                                                        .get()
+                                                                : null;
+                                                if (taskModel.getRateLimitPerFrequency() > 0
+                                                        && executionDAOFacade
+                                                                .exceedsRateLimitPerFrequency(
+                                                                        taskModel, taskDef)) {
+                                                    // Postpone this message, so that it would be
+                                                    // available for poll again.
+                                                    queueDAO.postpone(
+                                                            queueName,
+                                                            taskId,
+                                                            taskModel.getWorkflowPriority(),
+                                                            queueTaskMessagePostponeSecs);
+                                                    LOGGER.debug(
+                                                            "RateLimit Execution limited for {}:{}, limit:{}",
+                                                            taskId,
+                                                            taskModel.getTaskDefName(),
+                                                            taskModel.getRateLimitPerFrequency());
+                                                    return;
+                                                }
+
+                                                taskModel.setStatus(TaskModel.Status.IN_PROGRESS);
+                                                if (taskModel.getStartTime() == 0) {
+                                                    taskModel.setStartTime(
+                                                            System.currentTimeMillis());
+                                                    Monitors.recordQueueWaitTime(
+                                                            taskModel.getTaskDefName(),
+                                                            taskModel.getQueueWaitTime());
+                                                }
+                                                taskModel.setCallbackAfterSeconds(
+                                                        0); // reset callbackAfterSeconds when
+                                                // giving the task to the worker
+                                                taskModel.setWorkerId(workerId);
+                                                taskModel.incrementPollCount();
+                                                executionDAOFacade.updateTask(taskModel);
+                                                tasks.add(taskModel.toTask());
+                                            } catch (Exception e) {
+                                                // db operation failed for dequeued message,
+                                                // re-enqueue with a delay
+                                                LOGGER.error(
+                                                        "DB operation failed for task: {}, postponing task in queue",
+                                                        taskId,
+                                                        e);
+                                                Monitors.recordTaskPollError(
+                                                        taskType,
+                                                        domain,
+                                                        e.getClass().getSimpleName());
+                                                queueDAO.postpone(
+                                                        queueName,
+                                                        taskId,
+                                                        0,
+                                                        queueTaskMessagePostponeSecs);
+                                            } finally {
+                                                // calix
+                                                queueDAO.ack(queueName, taskId);
+                                                if (null != taskModel)
+                                                    taskStatusListener.onTaskInProgress(taskModel);
+                                                Monitors.recordTaskPollDuration(queueName, s);
+                                                // end calix
+                                            }
+                                        },
+                                        daoExecutor))
+                .toList()
+                .forEach(
+                        f -> {
+                            try {
+                                f.get();
+                            } catch (Exception e) {
+                                LOGGER.error("Polling failed", e);
+                            }
+                        });
+
+        /*
         for (String taskId : taskIds) {
             try {
                 TaskModel taskModel = executionDAOFacade.getTaskModel(taskId);
@@ -190,9 +322,13 @@ public class ExecutionService {
                 .filter(Objects::nonNull)
                 .filter(task -> TaskModel.Status.IN_PROGRESS.equals(task.getStatus()))
                 .forEach(taskStatusListener::onTaskInProgress);
+         */
+        // end calix
         executionDAOFacade.updateTaskLastPoll(taskType, domain, workerId);
         Monitors.recordTaskPoll(queueName);
-        tasks.forEach(this::ackTaskReceived);
+        // calix
+        // tasks.forEach(this::ackTaskReceived);
+        // end calix
         return tasks;
     }
 
@@ -630,4 +766,10 @@ public class ExecutionService {
             throw new IllegalArgumentException(errorMsg);
         }
     }
+
+    // calix
+    public boolean ackTaskReceived(String queueName, String taskId) {
+        return queueDAO.ack(queueName, taskId);
+    }
+    // end calix
 }

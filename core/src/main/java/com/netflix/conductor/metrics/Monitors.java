@@ -12,6 +12,7 @@
  */
 package com.netflix.conductor.metrics;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -191,9 +192,13 @@ public class Monitors {
                 .record(duration, TimeUnit.MILLISECONDS);
     }
 
-    public static void recordWorkflowDecisionTime(long duration) {
-        getTimer(classQualifier, "workflow_decision").record(duration, TimeUnit.MILLISECONDS);
+    // calix
+    public static void recordWorkflowDecisionTime(String workflowType, long duration) {
+        getTimer(classQualifier, "workflow_decision", "workflowType", workflowType)
+                .record(duration, TimeUnit.MILLISECONDS);
     }
+
+    // end calix
 
     public static void recordTaskPollError(String taskType, String exception) {
         recordTaskPollError(taskType, NO_DOMAIN, exception);
@@ -589,4 +594,72 @@ public class Monitors {
     public static void recordTaskExecLogSize(int val) {
         gauge(classQualifier, "task_exec_log_size", val);
     }
+
+    // calix
+    public static long now() {
+        return Instant.now().toEpochMilli();
+    }
+
+    public static void recordTaskPollDuration(String taskType, long start) {
+        getTimer(classQualifier, "task_poll_duration", "taskType", taskType)
+                .record(Instant.now().toEpochMilli() - start, TimeUnit.MILLISECONDS);
+    }
+
+    public static long recordWorkflowComplete(String workflowType, String action, long start) {
+        long s = Instant.now().toEpochMilli();
+        getTimer(
+                        classQualifier,
+                        "workflow_complete_duration",
+                        "workflowType",
+                        workflowType,
+                        "action",
+                        action)
+                .record(s - start, TimeUnit.MILLISECONDS);
+        return s;
+    }
+
+    public static long recordWorkflowDecision(String workflowType, String action, long start) {
+        long s = Instant.now().toEpochMilli();
+        getTimer(
+                        classQualifier,
+                        "workflow_decision_duration",
+                        "workflowType",
+                        workflowType,
+                        "action",
+                        action)
+                .record(s - start, TimeUnit.MILLISECONDS);
+        return s;
+    }
+
+    public static long recordWorkflowTaskSys(String taskType, String action, long start) {
+        long s = Instant.now().toEpochMilli();
+        getTimer(
+                        classQualifier,
+                        "workflow_sys_task_duration",
+                        "taskType",
+                        taskType,
+                        "action",
+                        "async_sys_task_" + action)
+                .record(s - start, TimeUnit.MILLISECONDS);
+        return s;
+    }
+
+    public static void recordTaskUpdateDuration(String taskType, long start) {
+        getTimer(classQualifier, "workflow_task_update_duration", "taskType", taskType)
+                .record(Instant.now().toEpochMilli() - start, TimeUnit.MILLISECONDS);
+    }
+
+    public static long recordWorkflowStartDuration(String workflowType, String action, long start) {
+        long s = Instant.now().toEpochMilli();
+        getTimer(
+                        classQualifier,
+                        "workflow_start_duration",
+                        "workflowType",
+                        workflowType,
+                        "action",
+                        "wf_start_" + action)
+                .record(s - start, TimeUnit.MILLISECONDS);
+        return s;
+    }
+    // end calix
 }
