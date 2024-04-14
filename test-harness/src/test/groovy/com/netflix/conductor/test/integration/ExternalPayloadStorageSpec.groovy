@@ -87,6 +87,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -146,6 +149,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_SYNCHRONOUS_SYSTEM_TASK, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -188,6 +194,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(CONDITIONAL_SYSTEM_TASK_WORKFLOW, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -284,6 +293,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(FORK_JOIN_WF, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -423,6 +435,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_INLINE_SUB_WF, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -577,6 +592,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -671,6 +689,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_DECISION_AND_TERMINATE, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -722,6 +743,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -769,6 +793,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1, 'multi_task_update_external_storage', new HashMap<String, Object>(), null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -871,6 +898,9 @@ class ExternalPayloadStorageSpec extends AbstractSpecification {
 
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(FORK_JOIN_WF, 1, correlationId, null, workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

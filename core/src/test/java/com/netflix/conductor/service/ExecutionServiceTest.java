@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +51,7 @@ public class ExecutionServiceTest {
     @Mock private ExternalPayloadStorage externalPayloadStorage;
     @Mock private SystemTaskRegistry systemTaskRegistry;
     @Mock private TaskStatusListener taskStatusListener;
+    @Mock private Executor daoExecutor;
 
     private ExecutionService executionService;
 
@@ -71,7 +73,8 @@ public class ExecutionServiceTest {
                         conductorProperties,
                         externalPayloadStorage,
                         systemTaskRegistry,
-                        taskStatusListener);
+                        taskStatusListener,
+                        daoExecutor);
         WorkflowDef workflowDef = new WorkflowDef();
         workflow1 = new Workflow();
         workflow1.setWorkflowId("wf1");

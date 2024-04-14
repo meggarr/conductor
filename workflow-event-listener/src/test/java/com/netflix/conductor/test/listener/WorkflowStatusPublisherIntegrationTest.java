@@ -170,6 +170,12 @@ public class WorkflowStatusPublisherIntegrationTest {
         workflowExecutionService.updateTask(new TaskResult(tasks.get(0)));
 
         checkIfWorkflowIsCompleted(id);
+        // calix
+        try {
+            Thread.sleep(1000L);
+        } catch (Exception e) {
+        }
+        // end calix
 
         List<Message> callbackMessages = queueDAO.pollMessages(CALLBACK_QUEUE, 1, 200);
         queueDAO.ack(CALLBACK_QUEUE, callbackMessages.get(0).getId());
@@ -213,6 +219,14 @@ public class WorkflowStatusPublisherIntegrationTest {
         startWorkflowInput.setVersion(version);
         startWorkflowInput.setCorrelationId(correlationId);
         startWorkflowInput.setInput(input);
-        return workflowExecutor.startWorkflow(startWorkflowInput);
+        // calix
+        // return workflowExecutor.startWorkflow(startWorkflowInput);
+        String wfId = workflowExecutor.startWorkflow(startWorkflowInput);
+        try {
+            Thread.sleep(1000L);
+        } catch (Exception e) {
+        }
+        return wfId;
+        // end calix
     }
 }

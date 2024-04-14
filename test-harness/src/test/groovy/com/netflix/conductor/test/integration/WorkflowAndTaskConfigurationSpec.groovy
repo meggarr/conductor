@@ -88,6 +88,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_OPTIONAL_TASK, 1,
                 correlationId, workflowInput,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the optional task is in a scheduled state"
         workflowInstanceId
@@ -160,6 +163,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_PERMISSIVE_TASK, 1,
                 correlationId, workflowInput,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the permissive task is in a scheduled state"
         workflowInstanceId
@@ -237,6 +243,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_PERMISSIVE_OPTIONAL_TASK, 1,
                 correlationId, workflowInput,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the permissive optional task is in a scheduled state"
         workflowInstanceId
@@ -308,6 +317,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(TEMPLATED_LINEAR_WORKFLOW, 1,
                 correlationId, workflowInput,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         workflowExecutor.decide(workflowInstanceId)
         def pollAndCompleteTask1Try1 = workflowTestUtil.pollAndCompleteTask('integration_task_1', 'task1.integration.worker', ['op': 'task1.done'])
 
@@ -345,6 +357,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -424,6 +439,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(TEST_WORKFLOW, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -474,6 +492,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
 
         def workflowInstanceId = startWorkflow(TEST_WORKFLOW, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -539,6 +560,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
 
         def workflowInstanceId = startWorkflow(TEST_WORKFLOW, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -602,6 +626,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -732,6 +759,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(TEST_WORKFLOW, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -798,6 +828,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -872,6 +905,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         when: "Start a workflow based on a task that has a registered wait time out"
         def workflowInstanceId = startWorkflow(WAIT_TIME_OUT_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the first task scheduled"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -940,6 +976,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(LINEAR_WORKFLOW_T1_T2, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1046,6 +1085,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         def input = new HashMap()
         def correlationId = 'empty_workflow'
         def workflowInstanceId = startWorkflowOperation.execute(new StartWorkflowInput(workflowDefinition: emptyWorkflowDef, workflowInput: input, correlationId: correlationId))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "the workflow is completed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1101,6 +1143,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         when: "the workflow is started"
         def correlationId = 'workflow_taskdef_template'
         def workflowInstanceId = startWorkflowOperation.execute(new StartWorkflowInput(workflowDefinition: templateWorkflowDef, workflowInput: input, correlationId: correlationId))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1139,6 +1184,9 @@ class WorkflowAndTaskConfigurationSpec extends AbstractSpecification {
         when: "the workflow is started"
         def correlationId = 'workflow_taskdef_not_registered'
         def workflowInstanceId = startWorkflowOperation.execute(new StartWorkflowInput(workflowDefinition: testWorkflowDef, workflowInput: [:], correlationId: correlationId))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

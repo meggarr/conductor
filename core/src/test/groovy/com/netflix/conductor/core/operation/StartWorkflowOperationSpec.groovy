@@ -57,6 +57,9 @@ class StartWorkflowOperationSpec extends Specification {
 
         when:
         def workflowId = startWorkflowOperation.execute(startWorkflowInput)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         workflowId == generatedWorkflowId

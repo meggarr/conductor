@@ -43,6 +43,9 @@ class EventTaskSpec extends AbstractSpecification {
         when: "Start a event based workflow"
         def workflowInstanceId = startWorkflow(EVENT_BASED_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Retrieve the workflow"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -84,6 +87,9 @@ class EventTaskSpec extends AbstractSpecification {
         when: "The event task workflow is started"
         def workflowInstanceId = startWorkflow(EVENT_BASED_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Retrieve the workflow"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

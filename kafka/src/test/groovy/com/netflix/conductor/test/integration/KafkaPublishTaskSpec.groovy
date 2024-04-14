@@ -53,6 +53,9 @@ class KafkaPublishTaskSpec extends AbstractSpecification {
         given: "Start a workflow based on the registered workflow"
         def workflowInstanceId = workflowService.startWorkflow("template_kafka_workflow", 1,
                 "testTaskDefTemplate", 0, kafkaInput)
+        // calix
+        Thread.sleep(2000L)
+        // end calix
 
         and: "Get the workflow based on the Id that is being executed"
         def workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)
@@ -101,6 +104,9 @@ class KafkaPublishTaskSpec extends AbstractSpecification {
         given: "Start a workflow based on the registered kafka workflow"
         def workflowInstanceId = workflowService.startWorkflow("template_kafka_workflow", 1,
                 "testTaskDefTemplate", 0, kafkaInput)
+        // calix
+        Thread.sleep(2000L)
+        // end calix
 
         and: "Get the workflow based on the Id that is being executed"
         def workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)

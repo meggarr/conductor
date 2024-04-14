@@ -37,6 +37,9 @@ class SetVariableTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the set variable task"
         def workflowInstanceId = startWorkflow(SET_VARIABLE_WF, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the task is completed and variables were set"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -64,6 +67,9 @@ class SetVariableTaskSpec extends AbstractSpecification {
                 String.format(
                         "The variables payload size: %d of workflow: %s is greater than the permissible limit: %d kilobytes",
                         EXTRA_HASHMAP_SIZE + maxThreshold * 1024 + 1, workflowInstanceId, maxThreshold)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the task is completed and variables were set"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

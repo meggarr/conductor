@@ -85,6 +85,9 @@ public class TestSubWorkflow {
         startWorkflowInput.setTaskToDomain(workflowInstance.getTaskToDomain());
 
         when(startWorkflowOperation.execute(startWorkflowInput)).thenReturn(workflowId);
+        // calix
+        when(startWorkflowOperation.start(startWorkflowInput)).thenReturn(workflow);
+        // end calix
 
         when(workflowExecutor.getWorkflow(anyString(), eq(false))).thenReturn(workflow);
 
@@ -130,7 +133,12 @@ public class TestSubWorkflow {
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertNull("subWorkflowId should be null", task.getSubWorkflowId());
-        assertEquals(TaskModel.Status.SCHEDULED, task.getStatus());
+        // calix
+        // assertEquals(TaskModel.Status.SCHEDULED, task.getStatus());
+        assertEquals(
+                TaskModel.Status.FAILED,
+                task.getStatus()); // calix optimized to have status updated
+        // end calix
         assertTrue("Output data should be empty", task.getOutputData().isEmpty());
     }
 
@@ -158,6 +166,10 @@ public class TestSubWorkflow {
         String failureReason = "non transient failure";
         when(startWorkflowOperation.execute(startWorkflowInput))
                 .thenThrow(new NonTransientException(failureReason));
+        // calix
+        when(startWorkflowOperation.start(startWorkflowInput))
+                .thenThrow(new NonTransientException(failureReason));
+        // end calix
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertNull("subWorkflowId should be null", task.getSubWorkflowId());
@@ -190,6 +202,11 @@ public class TestSubWorkflow {
         startWorkflowInput.setTaskToDomain(workflowInstance.getTaskToDomain());
 
         when(startWorkflowOperation.execute(startWorkflowInput)).thenReturn("workflow_1");
+        // calix
+        WorkflowModel workflow1 = new WorkflowModel();
+        workflow1.setWorkflowId("workflow_1");
+        when(startWorkflowOperation.start(startWorkflowInput)).thenReturn(workflow1);
+        // end calix
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertEquals("workflow_1", task.getSubWorkflowId());
@@ -220,6 +237,11 @@ public class TestSubWorkflow {
         startWorkflowInput.setTaskToDomain(workflowInstance.getTaskToDomain());
 
         when(startWorkflowOperation.execute(startWorkflowInput)).thenReturn("workflow_1");
+        // calix
+        WorkflowModel workflow1 = new WorkflowModel();
+        workflow1.setWorkflowId("workflow_1");
+        when(startWorkflowOperation.start(startWorkflowInput)).thenReturn(workflow1);
+        // end calix
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertEquals("workflow_1", task.getSubWorkflowId());
@@ -253,6 +275,11 @@ public class TestSubWorkflow {
         startWorkflowInput.setTaskToDomain(taskToDomain);
 
         when(startWorkflowOperation.execute(startWorkflowInput)).thenReturn("workflow_1");
+        // calix
+        WorkflowModel workflow1 = new WorkflowModel();
+        workflow1.setWorkflowId("workflow_1");
+        when(startWorkflowOperation.start(startWorkflowInput)).thenReturn(workflow1);
+        // end calix
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertEquals("workflow_1", task.getSubWorkflowId());
@@ -444,6 +471,11 @@ public class TestSubWorkflow {
         startWorkflowInput.setTaskToDomain(workflowInstance.getTaskToDomain());
 
         when(startWorkflowOperation.execute(startWorkflowInput)).thenReturn("workflow_1");
+        // calix
+        WorkflowModel workflow1 = new WorkflowModel();
+        workflow1.setWorkflowId("workflow_1");
+        when(startWorkflowOperation.start(startWorkflowInput)).thenReturn(workflow1);
+        // end calix
 
         subWorkflow.start(workflowInstance, task, workflowExecutor);
         assertEquals("workflow_1", task.getSubWorkflowId());

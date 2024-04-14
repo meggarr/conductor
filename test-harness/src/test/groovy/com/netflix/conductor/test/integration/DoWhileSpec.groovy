@@ -53,6 +53,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("do_while_five_loop_over_integration_test", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(3000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -195,6 +198,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("do_while_system_tasks", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -246,6 +252,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("Do_While_Workflow", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -309,6 +318,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, joinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in completed state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -338,6 +350,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("Do_While_Sub_Workflow", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -401,6 +416,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, joinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in completed state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -428,6 +446,9 @@ class DoWhileSpec extends AbstractSpecification {
         def parentWorkflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)
         def subWorkflowTaskId = parentWorkflow.getTaskByRefName('st1__1').taskId
         asyncSystemTaskExecutor.execute(subWorkflowTask, subWorkflowTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the sub workflow task is in a IN PROGRESS state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -507,6 +528,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A workflow with multiple do while tasks with multiple iterations is started"
         def workflowInstanceId = startWorkflow("Do_While_Multiple", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -570,6 +594,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, join1Id)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in running state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -665,6 +692,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, join2Id)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in running state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedSecondIterationTask2)
@@ -751,6 +781,9 @@ class DoWhileSpec extends AbstractSpecification {
         def workflowInput = new HashMap()
         workflowInput['loop'] = 1
         def workflowInstanceId = startWorkflow("Do_While_Workflow", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -848,6 +881,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, joinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in completed state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -889,6 +925,9 @@ class DoWhileSpec extends AbstractSpecification {
         def workflowInput = new HashMap()
         workflowInput['loop'] = 1
         def workflowInstanceId = startWorkflow("Do_While_Workflow", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -976,6 +1015,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, joinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in completed state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -1010,6 +1052,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("Do_While_SubTask", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1082,6 +1127,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         and: "JOIN task is executed"
         asyncSystemTaskExecutor.execute(joinTask, joinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the task was polled and acknowledged and workflow is in completed state"
         verifyPolledAndAcknowledgedTask(polledAndCompletedTask2)
@@ -1110,6 +1158,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("Do_While_Workflow_Iteration_Fix", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has competed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1133,6 +1184,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("do_while_Set_variable_fix", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has competed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1156,6 +1210,9 @@ class DoWhileSpec extends AbstractSpecification {
 
         when: "A do_while workflow is started"
         def workflowInstanceId = startWorkflow("DO_While_with_Decision_task", 1, "looptest", workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the loop over task is waiting for the wait task to get completed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

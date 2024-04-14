@@ -64,12 +64,14 @@ public class WorkflowSweeper {
             Optional<WorkflowRepairService> workflowRepairService,
             ConductorProperties properties,
             QueueDAO queueDAO,
-            ExecutionDAOFacade executionDAOFacade) {
+            ExecutionDAOFacade executionDAOFacade,
+            ExecutionLockService lockService) {
         this.properties = properties;
         this.queueDAO = queueDAO;
         this.workflowExecutor = workflowExecutor;
         this.executionDAOFacade = executionDAOFacade;
         this.workflowRepairService = workflowRepairService.orElse(null);
+        this.lockService = lockService;
         LOGGER.info("WorkflowSweeper initialized.");
     }
 

@@ -14,14 +14,10 @@ package com.netflix.conductor.core.operation;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -33,7 +29,6 @@ import com.netflix.conductor.core.event.WorkflowCreationEvent;
 import com.netflix.conductor.core.event.WorkflowEvaluationEvent;
 import com.netflix.conductor.core.exception.TransientException;
 import com.netflix.conductor.core.execution.StartWorkflowInput;
-import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.core.metadata.MetadataMapperService;
 import com.netflix.conductor.core.utils.IDGenerator;
 import com.netflix.conductor.core.utils.ParametersUtils;
@@ -52,13 +47,6 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
     private final ExecutionDAOFacade executionDAOFacade;
     private final ExecutionLockService executionLockService;
     private final ApplicationEventPublisher eventPublisher;
-
-    // calix
-    @Autowired
-    @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_START)
-    private Executor asyncStart;
-
-    // end calix
 
     public StartWorkflowOperation(
             MetadataMapperService metadataMapperService,
@@ -208,9 +196,7 @@ public class StartWorkflowOperation implements WorkflowOperation<StartWorkflowIn
             executionLockService.releaseLock(workflow.getWorkflowId());
         }
         // calix
-        CompletableFuture.runAsync(
-                () -> eventPublisher.publishEvent(new WorkflowEvaluationEvent(workflow)),
-                asyncStart);
+        eventPublisher.publishEvent(new WorkflowEvaluationEvent(workflow));
         // end calix
 
     }

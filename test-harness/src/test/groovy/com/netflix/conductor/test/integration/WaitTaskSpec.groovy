@@ -42,6 +42,9 @@ class WaitTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the set variable task"
         def workflowInstanceId = startWorkflow(SET_VARIABLE_WORKFLOW, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the simple task is scheduled"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -95,6 +98,9 @@ class WaitTaskSpec extends AbstractSpecification {
         when: "Start a wait task based workflow"
         def workflowInstanceId = startWorkflow(WAIT_BASED_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Retrieve the workflow"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

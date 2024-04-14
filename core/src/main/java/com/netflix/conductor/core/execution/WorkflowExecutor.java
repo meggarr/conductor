@@ -106,6 +106,10 @@ public class WorkflowExecutor {
     @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_LISTENER)
     private Executor asyncListener;
 
+    @Autowired
+    @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_START)
+    private Executor asyncStart;
+
     // end calix
 
     public WorkflowExecutor(
@@ -121,7 +125,9 @@ public class WorkflowExecutor {
             SystemTaskRegistry systemTaskRegistry,
             ParametersUtils parametersUtils,
             IDGenerator idGenerator,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher,
+            @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_LISTENER) Executor asyncListener,
+            @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_START) Executor asyncStart) {
         this.deciderService = deciderService;
         this.metadataDAO = metadataDAO;
         this.queueDAO = queueDAO;
@@ -136,6 +142,8 @@ public class WorkflowExecutor {
         this.idGenerator = idGenerator;
         this.systemTaskRegistry = systemTaskRegistry;
         this.eventPublisher = eventPublisher;
+        this.asyncListener = asyncListener;
+        this.asyncStart = asyncStart;
     }
 
     /**
@@ -1052,8 +1060,12 @@ public class WorkflowExecutor {
     @EventListener(WorkflowEvaluationEvent.class)
     public void handleWorkflowEvaluationEvent(WorkflowEvaluationEvent wee) {
         // calix
-        WorkflowModel w = wee.getWorkflowModel();
-        locked(decideWithLock(w), w.getWorkflowId());
+        CompletableFuture.runAsync(
+                () -> {
+                    WorkflowModel w = wee.getWorkflowModel();
+                    locked(decideWithLock(w), w.getWorkflowId());
+                },
+                asyncStart);
         // end calix
     }
 

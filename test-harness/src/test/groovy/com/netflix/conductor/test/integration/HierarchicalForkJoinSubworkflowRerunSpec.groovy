@@ -79,6 +79,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         when: "the workflow is started"
         rootWorkflowId = startWorkflow(FORK_JOIN_HIERARCHICAL_SUB_WF, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(rootWorkflowId, true)) {
@@ -103,6 +106,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         when: "the subworkflow task should be in SCHEDULED state and is started by issuing a system task call"
         List<String> polledTaskIds = queueDAO.pop(TASK_TYPE_SUB_WORKFLOW, 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the 'sub_workflow_task' is in a IN_PROGRESS state"
         def rootWorkflowInstance = workflowExecutionService.getExecutionStatus(rootWorkflowId, true)
@@ -132,6 +138,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         when: "the subworkflow task should be in SCHEDULED state and is started by issuing a system task call"
         polledTaskIds = queueDAO.pop(TASK_TYPE_SUB_WORKFLOW, 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         def midLevelWorkflowInstance = workflowExecutionService.getExecutionStatus(midLevelWorkflowId, true)
 
         then: "verify that the leaf workflow is RUNNING, and first task is in SCHEDULED state"
@@ -213,6 +222,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         def reRunWorkflowRequest = new RerunWorkflowRequest()
         reRunWorkflowRequest.reRunFromWorkflowId = rootWorkflowId
         workflowExecutor.rerun(reRunWorkflowRequest)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the root workflow created a new execution"
         with(workflowExecutionService.getExecutionStatus(rootWorkflowId, true)) {
@@ -235,6 +247,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "the subworkflow task should be in SCHEDULED state and is started by issuing a system task call"
         def polledTaskIds = queueDAO.pop(TASK_TYPE_SUB_WORKFLOW, 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         def newMidLevelWorkflowId = workflowExecutionService.getTask(polledTaskIds[0]).subWorkflowId
 
         then: "verify that a new mid level workflow is created and is in RUNNING state"
@@ -259,6 +274,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "poll and execute the sub workflow task"
         polledTaskIds = queueDAO.pop(TASK_TYPE_SUB_WORKFLOW, 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         def newLeafWorkflowId = workflowExecutionService.getTask(polledTaskIds[0]).subWorkflowId
 
         then: "verify that a new leaf workflow is created and is in RUNNING state"
@@ -291,6 +309,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "JOIN tasks are executed"
         asyncSystemTaskExecutor.execute(joinTask, midJoinId)
         asyncSystemTaskExecutor.execute(joinTask, rootJoinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "the new mid level workflow is in COMPLETED state"
         assertWorkflowIsCompleted(newMidLevelWorkflowId)
@@ -353,6 +374,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "the SUB_WORKFLOW task in mid level workflow is started by issuing a system task call"
         def polledTaskIds = queueDAO.pop(TASK_TYPE_SUB_WORKFLOW, 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         def newLeafWorkflowId = workflowExecutionService.getTask(polledTaskIds[0]).subWorkflowId
 
         then: "verify that a new leaf workflow is created and is in RUNNING state"
@@ -385,6 +409,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "JOIN tasks are executed"
         asyncSystemTaskExecutor.execute(joinTask, midJoinId)
         asyncSystemTaskExecutor.execute(joinTask, rootJoinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the mid level and root workflows reach COMPLETED state"
         assertWorkflowIsCompleted(midLevelWorkflowId)
@@ -503,6 +530,9 @@ class HierarchicalForkJoinSubworkflowRerunSpec extends AbstractSpecification {
         and: "JOIN tasks are executed"
         asyncSystemTaskExecutor.execute(joinTask, midJoinId)
         asyncSystemTaskExecutor.execute(joinTask, rootJoinId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the mid level and root workflows reach COMPLETED state"
         assertWorkflowIsCompleted(midLevelWorkflowId)

@@ -69,6 +69,9 @@ class StartWorkflowSpec extends Specification {
 
         when:
         startWorkflow.start(workflowModel, taskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         taskModel.status == FAILED
@@ -81,6 +84,9 @@ class StartWorkflowSpec extends Specification {
 
         when:
         startWorkflow.start(workflowModel, taskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         taskModel.status == FAILED
@@ -90,6 +96,9 @@ class StartWorkflowSpec extends Specification {
     def "WorkflowExecutor throws a retryable exception"() {
         when:
         startWorkflow.start(workflowModel, taskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         taskModel.status == SCHEDULED
@@ -99,6 +108,9 @@ class StartWorkflowSpec extends Specification {
     def "WorkflowExecutor throws a NotFoundException"() {
         when:
         startWorkflow.start(workflowModel, taskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         taskModel.status == FAILED
@@ -109,6 +121,9 @@ class StartWorkflowSpec extends Specification {
     def "WorkflowExecutor throws a RuntimeException"() {
         when:
         startWorkflow.start(workflowModel, taskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then:
         taskModel.status == FAILED

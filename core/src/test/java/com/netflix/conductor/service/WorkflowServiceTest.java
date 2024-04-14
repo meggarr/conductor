@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +35,7 @@ import com.netflix.conductor.common.run.Workflow;
 import com.netflix.conductor.common.run.WorkflowSummary;
 import com.netflix.conductor.core.exception.NotFoundException;
 import com.netflix.conductor.core.execution.WorkflowExecutor;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.core.operation.StartWorkflowOperation;
 
 import jakarta.validation.ConstraintViolationException;
@@ -54,6 +56,24 @@ public class WorkflowServiceTest {
 
     @TestConfiguration
     static class TestWorkflowConfiguration {
+
+        // calix
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_DAO)
+        public Executor daoExecutor() {
+            return mock(Executor.class);
+        }
+
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_LISTENER)
+        Executor asyncListener() {
+            return mock(Executor.class);
+        }
+
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_START)
+        Executor asyncStart() {
+            return mock(Executor.class);
+        }
+
+        // end calix
 
         @Bean
         public WorkflowExecutor workflowExecutor() {

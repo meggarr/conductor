@@ -42,6 +42,9 @@ class TaskResiliencySpec extends AbstractResiliencySpecification {
         when: "Start a simple workflow"
         def workflowInstanceId = startWorkflow(SIMPLE_TWO_TASK_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Retrieve the workflow"
         def workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)

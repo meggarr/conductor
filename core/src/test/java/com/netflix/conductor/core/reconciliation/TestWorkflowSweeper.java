@@ -25,10 +25,12 @@ import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.core.config.ConductorProperties;
 import com.netflix.conductor.core.dal.ExecutionDAOFacade;
 import com.netflix.conductor.core.execution.WorkflowExecutor;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.dao.QueueDAO;
 import com.netflix.conductor.model.TaskModel;
 import com.netflix.conductor.model.TaskModel.Status;
 import com.netflix.conductor.model.WorkflowModel;
+import com.netflix.conductor.service.ExecutionLockService;
 
 import static com.netflix.conductor.core.utils.Utils.DECIDER_QUEUE;
 
@@ -44,6 +46,7 @@ public class TestWorkflowSweeper {
     private WorkflowRepairService workflowRepairService;
     private QueueDAO queueDAO;
     private ExecutionDAOFacade executionDAOFacade;
+    private ExecutionLockService lockService;
     private WorkflowSweeper workflowSweeper;
 
     private int defaultPostPoneOffSetSeconds = 1800;
@@ -55,19 +58,26 @@ public class TestWorkflowSweeper {
         queueDAO = mock(QueueDAO.class);
         workflowRepairService = mock(WorkflowRepairService.class);
         executionDAOFacade = mock(ExecutionDAOFacade.class);
+        lockService = mock(ExecutionLockService.class);
         workflowSweeper =
                 new WorkflowSweeper(
                         workflowExecutor,
                         Optional.of(workflowRepairService),
                         properties,
                         queueDAO,
-                        executionDAOFacade);
+                        executionDAOFacade,
+                        lockService);
     }
 
     @Test
     public void testPostponeDurationForHumanTaskType() {
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_HUMAN);
@@ -75,6 +85,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -87,6 +102,11 @@ public class TestWorkflowSweeper {
     public void testPostponeDurationForWaitTaskType() {
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_WAIT);
@@ -94,6 +114,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -107,6 +132,11 @@ public class TestWorkflowSweeper {
         long waitTimeout = 65845;
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_WAIT);
@@ -115,6 +145,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -126,6 +161,11 @@ public class TestWorkflowSweeper {
         long waitTimeout = 180;
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_WAIT);
@@ -134,6 +174,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -145,6 +190,11 @@ public class TestWorkflowSweeper {
         long waitTimeout = 0;
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_WAIT);
@@ -153,6 +203,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -163,6 +218,11 @@ public class TestWorkflowSweeper {
     public void testPostponeDurationForTaskInProgress() {
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_SIMPLE);
@@ -170,6 +230,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -183,6 +248,11 @@ public class TestWorkflowSweeper {
         long responseTimeout = 200;
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskModel taskModel = new TaskModel();
         taskModel.setTaskId("task1");
         taskModel.setTaskType(TaskType.TASK_TYPE_SIMPLE);
@@ -191,6 +261,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -211,6 +286,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -234,6 +314,11 @@ public class TestWorkflowSweeper {
         workflowModel.setTasks(List.of(taskModel));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -255,6 +340,11 @@ public class TestWorkflowSweeper {
         when(taskModel.getStatus()).thenReturn(Status.SCHEDULED);
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -274,6 +364,11 @@ public class TestWorkflowSweeper {
         when(taskModel.getStatus()).thenReturn(Status.SCHEDULED);
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -295,6 +390,11 @@ public class TestWorkflowSweeper {
         when(taskModel.getTaskDefinition()).thenReturn(Optional.of(taskDef));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(
@@ -308,6 +408,11 @@ public class TestWorkflowSweeper {
         int pollTimeout = 200;
         WorkflowModel workflowModel = new WorkflowModel();
         workflowModel.setWorkflowId("1");
+        // calix
+        WorkflowDef workflowDef = mock(WorkflowDef.class);
+        when(workflowDef.getName()).thenReturn("workflow1");
+        workflowModel.setWorkflowDefinition(workflowDef);
+        // end calix
         TaskDef taskDef = new TaskDef();
         taskDef.setPollTimeoutSeconds(pollTimeout);
         TaskModel taskModel = mock(TaskModel.class);
@@ -317,6 +422,11 @@ public class TestWorkflowSweeper {
         when(taskModel.getTaskDefinition()).thenReturn(Optional.of(taskDef));
         when(properties.getWorkflowOffsetTimeout())
                 .thenReturn(Duration.ofSeconds(defaultPostPoneOffSetSeconds));
+        // calix
+        when(lockService.acquireLock(
+                        WorkflowExternalBeans.lockedQueue(workflowModel.getWorkflowId()), 5, 60000))
+                .thenReturn(true);
+        // end calix
         workflowSweeper.unack(workflowModel, defaultPostPoneOffSetSeconds);
         verify(queueDAO)
                 .setUnackTimeout(

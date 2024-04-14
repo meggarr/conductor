@@ -50,6 +50,9 @@ class FailureWorkflowSpec extends AbstractSpecification {
         def testId = 'testId'
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_TERMINATE_TASK_FAILED, 1,
                 testId, workflowInput, null)
+        // calix
+        Thread.sleep(2000L)
+        // end calix
 
         then: "Verify that the workflow has failed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -86,8 +89,14 @@ class FailureWorkflowSpec extends AbstractSpecification {
         when: "Start the workflow which has the subworkflow task"
         def workflowInstanceId = startWorkflow(PARENT_WORKFLOW_WITH_FAILURE_TASK, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the tasks are as expected"
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
             status == Workflow.WorkflowStatus.RUNNING
             tasks.size() == 2
@@ -104,10 +113,16 @@ class FailureWorkflowSpec extends AbstractSpecification {
         def workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)
         def subWorkflowTaskId = workflow.getTaskByRefName("test_task_failed_sub_wf").getTaskId()
         asyncSystemTaskExecutor.execute(subWorkflowTask, subWorkflowTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)
         def subWorkflowId = workflow.getTaskByRefName("test_task_failed_sub_wf").subWorkflowId
 
         then: "verify that the sub workflow has failed"
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         with(workflowExecutionService.getExecutionStatus(subWorkflowId, true)) {
             status == Workflow.WorkflowStatus.FAILED
             tasks.size() == 2
@@ -121,6 +136,9 @@ class FailureWorkflowSpec extends AbstractSpecification {
         }
 
         then: "Verify that the workflow has failed and correct inputs passed into the failure workflow"
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
             status == Workflow.WorkflowStatus.FAILED
             tasks.size() == 2

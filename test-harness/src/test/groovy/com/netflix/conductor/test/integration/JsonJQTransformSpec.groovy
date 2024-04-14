@@ -57,6 +57,9 @@ class JsonJQTransformSpec extends AbstractSpecification {
         when: "workflow which has the json jq transform task has started"
         def workflowInstanceId = startWorkflow(JSON_JQ_TRANSFORM_WF, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow and task are completed with expected output"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -84,6 +87,9 @@ class JsonJQTransformSpec extends AbstractSpecification {
         when: "workflow which has the json jq transform task has started"
         def workflowInstanceId = startWorkflow(JSON_JQ_TRANSFORM_WF, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow and task failed with expected error"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -128,6 +134,9 @@ class JsonJQTransformSpec extends AbstractSpecification {
         when: "workflow which has the json jq transform task started"
         def workflowInstanceId = startWorkflow(JSON_JQ_TRANSFORM_WF, 1,
                 '', invalidInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow and task failed with expected error"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -170,6 +179,9 @@ class JsonJQTransformSpec extends AbstractSpecification {
         when: "workflow which has the json jq transform task has started"
         def workflowInstanceId = startWorkflow(SEQUENTIAL_JSON_JQ_TRANSFORM_WF, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow and task are completed with expected output"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -200,6 +212,9 @@ class JsonJQTransformSpec extends AbstractSpecification {
         when: "workflow which has the json jq transform task has started"
         def workflowInstanceId = startWorkflow(JSON_JQ_TRANSFORM_RESULT_WF, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow and task are completed with expected output"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

@@ -86,6 +86,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_WF, 1,
                 'fanoutTest', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the starting nodes of the each fork are in scheduled state"
         workflowInstanceId
@@ -192,6 +195,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_WF, 1,
                 'fanoutTest', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the starting nodes of the each fork are in scheduled state"
         workflowInstanceId
@@ -283,6 +289,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_PERMISSIVE_WF, 1,
                 'fanoutTest', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the starting nodes of the each fork are in scheduled state"
         workflowInstanceId
@@ -366,6 +375,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_WF + '_2', 1,
                 'fanoutTest', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the starting nodes of the each fork are in scheduled state"
         workflowInstanceId
@@ -499,6 +511,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_PERMISSIVE_WF + '_2', 1,
                 'fanoutTest', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the starting nodes of the each fork are in scheduled state"
         workflowInstanceId
@@ -662,6 +677,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_NESTED_WF, 1,
                 'fork_join_nested_test', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -842,6 +860,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_NESTED_SUB_WF, 1,
                 'fork_join_nested_test', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "The workflow is in the running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1071,6 +1092,9 @@ class ForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(WORKFLOW_FORK_JOIN_OPTIONAL_SW, 1,
                 '', workflowInput,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -1204,6 +1228,9 @@ class ForkJoinSpec extends AbstractSpecification {
 
         when: "A workflow that has fork with sub workflow task is started"
         def workflowInstanceId = startWorkflow(FORK_JOIN_SUB_WORKFLOW, 1, '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

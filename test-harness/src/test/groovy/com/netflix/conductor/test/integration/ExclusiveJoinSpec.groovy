@@ -47,6 +47,9 @@ class ExclusiveJoinSpec extends AbstractSpecification {
         when: "An exclusive join workflow is started with then workflow input"
         def workflowInstanceId = startWorkflow(EXCLUSIVE_JOIN_WF, 1, 'exclusive_join_workflow',
                 input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -84,6 +87,9 @@ class ExclusiveJoinSpec extends AbstractSpecification {
         when: "An exclusive join workflow is started with then workflow input"
         def workflowInstanceId = startWorkflow(EXCLUSIVE_JOIN_WF, 1, 'exclusive_join_workflow',
                 input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -142,6 +148,9 @@ class ExclusiveJoinSpec extends AbstractSpecification {
         when: "An exclusive join workflow is started with then workflow input"
         def workflowInstanceId = startWorkflow(EXCLUSIVE_JOIN_WF, 1, 'exclusive_join_workflow',
                 input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -225,6 +234,9 @@ class ExclusiveJoinSpec extends AbstractSpecification {
         when: "An exclusive join workflow is started with then workflow input"
         def workflowInstanceId = startWorkflow(EXCLUSIVE_JOIN_WF, 1, 'exclusive_join_workflow',
                 input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -283,6 +295,9 @@ class ExclusiveJoinSpec extends AbstractSpecification {
         when: "An exclusive join workflow is started with then workflow input"
         def workflowInstanceId = startWorkflow(EXCLUSIVE_JOIN_WF, 1, 'exclusive_join_workflow',
                 input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

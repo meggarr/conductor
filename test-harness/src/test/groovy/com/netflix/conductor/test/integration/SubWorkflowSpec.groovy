@@ -81,6 +81,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_SUBWORKFLOW, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -110,6 +113,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         List<String> polledTaskIds = queueDAO.pop("SUB_WORKFLOW", 1, 200)
         String subworkflowTaskId = polledTaskIds.get(0)
         asyncSystemTaskExecutor.execute(subWorkflowTask, subworkflowTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the 'sub_workflow_task' is in a IN_PROGRESS state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -229,6 +235,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_SUBWORKFLOW, 1,
                 correlationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -257,6 +266,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         when: "Polled for and executed subworkflow task"
         List<String> polledTaskIds = queueDAO.pop("SUB_WORKFLOW", 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         def workflow = workflowExecutionService.getExecutionStatus(workflowInstanceId, true)
         def subWorkflowId = workflow.tasks[1].subWorkflowId
 
@@ -329,6 +341,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_SUBWORKFLOW, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -357,6 +372,9 @@ class SubWorkflowSpec extends AbstractSpecification {
         when: "the subworkflow is started by issuing a system task call"
         List<String> polledTaskIds = queueDAO.pop("SUB_WORKFLOW", 1, 200)
         asyncSystemTaskExecutor.execute(subWorkflowTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the 'sub_workflow_task' is in a IN_PROGRESS state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

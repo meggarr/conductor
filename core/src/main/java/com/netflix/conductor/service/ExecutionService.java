@@ -80,7 +80,8 @@ public class ExecutionService {
             ConductorProperties properties,
             ExternalPayloadStorage externalPayloadStorage,
             SystemTaskRegistry systemTaskRegistry,
-            TaskStatusListener taskStatusListener) {
+            TaskStatusListener taskStatusListener,
+            @Qualifier(WorkflowExternalBeans.EXECUTOR_ASYNC_DAO) Executor daoExecutor) {
         this.workflowExecutor = workflowExecutor;
         this.executionDAOFacade = executionDAOFacade;
         this.queueDAO = queueDAO;
@@ -90,6 +91,7 @@ public class ExecutionService {
                 properties.getTaskExecutionPostponeDuration().getSeconds();
         this.systemTaskRegistry = systemTaskRegistry;
         this.taskStatusListener = taskStatusListener;
+        this.daoExecutor = daoExecutor;
     }
 
     public Task poll(String taskType, String workerId) {

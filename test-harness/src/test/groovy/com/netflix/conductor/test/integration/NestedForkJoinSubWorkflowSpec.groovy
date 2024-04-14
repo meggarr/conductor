@@ -76,6 +76,9 @@ class NestedForkJoinSubWorkflowSpec extends AbstractSpecification {
         when: "the workflow is started"
         parentWorkflowId = startWorkflow(FORK_JOIN_NESTED_SUB_WF, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a RUNNING state"
         with(workflowExecutionService.getExecutionStatus(parentWorkflowId, true)) {

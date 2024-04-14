@@ -65,6 +65,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that return value is true, iteration value is updated in DO_WHILE TaskModel"
         retVal
@@ -102,6 +105,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the return value is false, since the iteration is not complete"
         !retVal
@@ -136,6 +142,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the return value is true, since the iteration is updated"
         retVal
@@ -178,6 +187,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that return value is true, status is updated"
         retVal
@@ -220,6 +232,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that return value is false, since the DO_WHILE task model is not updated"
         !retVal
@@ -260,6 +275,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the return value is true, DO_WHILE TaskModel is updated"
         retVal
@@ -301,6 +319,9 @@ class DoWhileSpec extends Specification {
 
         when:
         def retVal = doWhile.execute(workflowModel, doWhileTaskModel, workflowExecutor)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the return value is true since DO_WHILE TaskModel is updated"
         retVal

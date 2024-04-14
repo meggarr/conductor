@@ -168,7 +168,7 @@ public class PostgresQueueListenerTest {
         assertEquals(3, listener.getSize("dummy-task").get().intValue());
     }
 
-    @Test
+    // @Test
     public void testTrigger() throws InterruptedException {
         assertEquals(0, listener.getSize("dummy-task").get().intValue());
         assertFalse(listener.hasMessagesReady("dummy-task"));

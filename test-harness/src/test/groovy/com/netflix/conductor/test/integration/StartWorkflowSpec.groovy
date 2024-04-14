@@ -54,6 +54,9 @@ class StartWorkflowSpec extends AbstractSpecification {
         when: "starter workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_THAT_STARTS_ANOTHER_WORKFLOW, 1,
                 correlationId, testCase.workflowInput, testCase.workflowInputPath)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the starter workflow is in RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -67,6 +70,9 @@ class StartWorkflowSpec extends AbstractSpecification {
         List<String> polledTaskIds = queueDAO.pop("START_WORKFLOW", 1, 200)
         String startWorkflowTaskId = polledTaskIds.get(0)
         asyncSystemTaskExecutor.execute(startWorkflowTask, startWorkflowTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify the START_WORKFLOW task and workflow are COMPLETED"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -106,6 +112,9 @@ class StartWorkflowSpec extends AbstractSpecification {
         when: "starter workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_THAT_STARTS_ANOTHER_WORKFLOW, 1,
                 null, workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the starter workflow is in RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -119,6 +128,9 @@ class StartWorkflowSpec extends AbstractSpecification {
         List<String> polledTaskIds = queueDAO.pop("START_WORKFLOW", 1, 200)
         String startWorkflowTaskId = polledTaskIds.get(0)
         asyncSystemTaskExecutor.execute(startWorkflowTask, startWorkflowTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify the START_WORKFLOW task and workflow FAILED"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

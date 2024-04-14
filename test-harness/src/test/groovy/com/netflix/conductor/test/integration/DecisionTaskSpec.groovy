@@ -57,6 +57,9 @@ class DecisionTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DECISION_WF, 1,
                 'decision_workflow', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -128,6 +131,9 @@ class DecisionTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_DECISION_WF, 1,
                 'decision_forkjoin', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -222,6 +228,9 @@ class DecisionTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 'conditional_default', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the default condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -263,6 +272,9 @@ class DecisionTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 workflowCorrelationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the 'nested' and '#caseValue' condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -312,6 +324,9 @@ class DecisionTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 'conditional_three', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the 'three' condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

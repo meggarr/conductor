@@ -14,6 +14,7 @@ package com.netflix.conductor.service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,7 @@ import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.run.SearchResult;
 import com.netflix.conductor.common.run.TaskSummary;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 import com.netflix.conductor.dao.QueueDAO;
 
 import jakarta.validation.ConstraintViolationException;
@@ -44,6 +46,13 @@ public class TaskServiceTest {
 
     @TestConfiguration
     static class TestTaskConfiguration {
+        // calix
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_DAO)
+        public Executor daoExecutor() {
+            return mock(Executor.class);
+        }
+
+        // end calix
 
         @Bean
         public ExecutionService executionService() {

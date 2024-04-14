@@ -64,6 +64,9 @@ class LambdaAndTerminateTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the terminate task"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_TERMINATE_TASK, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(2000L)
+        // end calix
 
         then: "Ensure that the workflow has started and the first task is in scheduled state and workflow output should be terminate task's output"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -89,6 +92,9 @@ class LambdaAndTerminateTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the terminate task"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_TERMINATE_TASK_FAILED, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that the workflow has failed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -120,6 +126,9 @@ class LambdaAndTerminateTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the terminate task"
         def workflowInstanceId = startWorkflow(PARENT_WORKFLOW_WITH_TERMINATE_TASK, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has started and the tasks are as expected"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -218,6 +227,9 @@ class LambdaAndTerminateTaskSpec extends AbstractSpecification {
         when: "The workflow is started"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_DECISION_AND_TERMINATE, 1, '',
                 workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in RUNNING state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -262,6 +274,9 @@ class LambdaAndTerminateTaskSpec extends AbstractSpecification {
         when: "Start the workflow which has the terminate task"
         def workflowInstanceId = startWorkflow(WORKFLOW_WITH_LAMBDA_TASK, 1,
                 '', workflowInput, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the task is completed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

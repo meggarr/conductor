@@ -53,6 +53,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_workflow', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has been successfully started and the first task is in scheduled state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -160,6 +163,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_workflow', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has been successfully started and the first task is in scheduled state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -244,6 +250,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_workflow', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has been successfully started and the first task is in scheduled state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -396,6 +405,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         when: "the dynamic fork join workflow is started"
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_wf_subwf', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is started and first task is in SCHEDULED state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -709,6 +721,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_workflow', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has been successfully started and the first task is in scheduled state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -805,6 +820,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(DYNAMIC_FORK_JOIN_WF, 1,
                 'dynamic_fork_join_workflow', [:],
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow has been successfully started and the first task is in scheduled state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -870,6 +888,9 @@ class DynamicForkJoinSpec extends AbstractSpecification {
 
         def startWorkflowInput = new StartWorkflowInput(name: workflowDef.name, version: workflowDef.version, workflowInput: workflowInput, workflowDefinition: workflowDef)
         def workflowInstanceId = startWorkflowOperation.execute(startWorkflowInput)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that workflow failed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

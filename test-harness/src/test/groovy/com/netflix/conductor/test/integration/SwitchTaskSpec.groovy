@@ -61,6 +61,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(SWITCH_WF, 1,
                 'switch_workflow', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -132,6 +135,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(FORK_JOIN_SWITCH_WF, 1,
                 'switch_forkjoin', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -203,6 +209,9 @@ class SwitchTaskSpec extends AbstractSpecification {
 
         when: "JOIN task is polled and executed"
         asyncSystemTaskExecutor.execute(joinTask, joinTaskId)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the JOIN is COMPLETED and the workflow has progressed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -226,6 +235,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 'conditional_default', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the default condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -267,6 +279,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 workflowCorrelationId, input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the 'nested' and '#caseValue' condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -316,6 +331,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(COND_TASK_WF, 1,
                 'conditional_three', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is running and the 'three' condition case was executed"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -377,6 +395,9 @@ class SwitchTaskSpec extends AbstractSpecification {
         def workflowInstanceId = startWorkflow(SWITCH_NODEFAULT_WF, 1,
                 'switch_no_default_workflow', input,
                 null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

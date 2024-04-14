@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.netflix.conductor.core.execution.WorkflowExecutor;
+import com.netflix.conductor.core.external.WorkflowExternalBeans;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -43,6 +45,19 @@ public class WorkflowBulkServiceTest {
 
     @TestConfiguration
     static class TestWorkflowBulkConfiguration {
+
+        // calix
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_LISTENER)
+        Executor asyncListener() {
+            return mock(Executor.class);
+        }
+
+        @Bean(WorkflowExternalBeans.EXECUTOR_ASYNC_START)
+        Executor asyncStart() {
+            return mock(Executor.class);
+        }
+
+        // end calix
 
         @Bean
         WorkflowExecutor workflowExecutor() {

@@ -60,6 +60,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def response = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         then: "Verify workflow starts when there are no Queue failures"
         response
 
@@ -67,6 +70,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         response = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify that workflow start fails with BACKEND_ERROR"
         1 * queueDAO.push(*_) >> { throw new TransientException("Queue push failed from Spy") }
@@ -78,6 +84,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
             status == Workflow.WorkflowStatus.RUNNING
@@ -105,6 +114,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         and: "We terminate it when QueueDAO is unavailable"
         workflowResource.terminate(workflowInstanceId, "Terminated from a test")
@@ -136,6 +148,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         and: "terminate it"
         workflowResource.terminate(workflowInstanceId, "Terminated from a test")
@@ -168,6 +183,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         and: "terminate it"
         workflowResource.terminate(workflowInstanceId, "Terminated from a test")
@@ -200,6 +218,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
             status == Workflow.WorkflowStatus.RUNNING
@@ -223,6 +244,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
             status == Workflow.WorkflowStatus.RUNNING
@@ -244,6 +268,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
         then: "Verify workflow is started"
 
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -277,6 +304,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -298,6 +328,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -326,6 +359,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -365,6 +401,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -432,6 +471,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {
@@ -465,6 +507,9 @@ class QueueResiliencySpec extends AbstractResiliencySpecification {
         def workflowInstanceId = workflowResource.startWorkflow(new StartWorkflowRequest()
                 .withName(SIMPLE_TWO_TASK_WORKFLOW)
                 .withVersion(1))
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "Verify workflow is started"
         with(workflowResource.getExecutionStatus(workflowInstanceId, true)) {

@@ -55,6 +55,9 @@ class SystemTaskSpec extends AbstractSpecification {
         when: "the workflow is started"
         def workflowInstanceId = startWorkflow(ASYNC_COMPLETE_SYSTEM_TASK_WORKFLOW, 1,
                 correlationId, input, null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "ensure that the workflow has started"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -83,6 +86,9 @@ class SystemTaskSpec extends AbstractSpecification {
         when: "the system task is started by issuing a system task call"
         List<String> polledTaskIds = queueDAO.pop("USER_TASK", 1, 200)
         asyncSystemTaskExecutor.execute(userTask, polledTaskIds[0])
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the system task is in IN_PROGRESS state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {

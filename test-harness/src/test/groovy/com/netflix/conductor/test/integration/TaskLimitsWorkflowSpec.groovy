@@ -47,6 +47,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
         when: "Start a workflow that has a rate limited system task in it"
         def workflowInstanceId = startWorkflow(RATE_LIMITED_SYSTEM_TASK_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -71,6 +74,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
         when: "A new instance of the workflow is started"
         def workflowTwoInstanceId = startWorkflow(RATE_LIMITED_SYSTEM_TASK_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowTwoInstanceId, true)) {
@@ -96,6 +102,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
     def "Verify that the rate limiting for simple tasks is honored"() {
         when: "Start a workflow that has a rate limited simple task in it"
         def workflowInstanceId = startWorkflow(RATE_LIMITED_SIMPLE_TASK_WORKFLOW, 1, '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowInstanceId, true)) {
@@ -122,6 +131,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
         when: "A new instance of the workflow is started"
         def workflowTwoInstanceId = startWorkflow(RATE_LIMITED_SIMPLE_TASK_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowTwoInstanceId, true)) {
@@ -163,6 +175,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
         when: "Start a workflow that has a concurrency execution limited task in it"
         def workflowInstanceId = startWorkflow(CONCURRENCY_EXECUTION_LIMITED_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
 
         then: "verify that the workflow is in a running state"
@@ -183,6 +198,9 @@ class TaskLimitsWorkflowSpec extends AbstractSpecification {
         when: "A additional workflow that has a concurrency execution limited task in it"
         def workflowTwoInstanceId = startWorkflow(CONCURRENCY_EXECUTION_LIMITED_WORKFLOW, 1,
                 '', [:], null)
+        // calix
+        Thread.sleep(1000L)
+        // end calix
 
         then: "verify that the workflow is in a running state"
         with(workflowExecutionService.getExecutionStatus(workflowTwoInstanceId, true)) {

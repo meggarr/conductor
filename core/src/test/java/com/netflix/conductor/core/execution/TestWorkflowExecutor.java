@@ -14,6 +14,8 @@ package com.netflix.conductor.core.execution;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -210,6 +212,7 @@ public class TestWorkflowExecutor {
         when(properties.getTaskExecutionPostponeDuration()).thenReturn(Duration.ofSeconds(60));
         when(properties.getWorkflowOffsetTimeout()).thenReturn(Duration.ofSeconds(30));
 
+        Executor asyncExecutor = Executors.newSingleThreadExecutor();
         workflowExecutor =
                 new WorkflowExecutor(
                         deciderService,
@@ -224,7 +227,9 @@ public class TestWorkflowExecutor {
                         systemTaskRegistry,
                         parametersUtils,
                         idGenerator,
-                        eventPublisher);
+                        eventPublisher,
+                        asyncExecutor,
+                        asyncExecutor);
     }
 
     @Test
@@ -381,7 +386,7 @@ public class TestWorkflowExecutor {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testCompleteWorkflow() {
+    public void testCompleteWorkflow() throws Exception {
         WorkflowDef def = new WorkflowDef();
         def.setName("test");
 
@@ -424,10 +429,12 @@ public class TestWorkflowExecutor {
                 .remove(anyString(), anyString());
 
         workflowExecutor.completeWorkflow(workflow);
+        Thread.sleep(2000L);
         assertEquals(WorkflowModel.Status.COMPLETED, workflow.getStatus());
         assertEquals(1, updateWorkflowCalledCounter.get());
         assertEquals(0, updateTasksCalledCounter.get());
         assertEquals(0, removeQueueEntryCalledCounter.get());
+        Thread.sleep(2000L);
         verify(workflowStatusListener, times(1))
                 .onWorkflowCompletedIfEnabled(any(WorkflowModel.class));
         verify(workflowStatusListener, times(0))
@@ -436,6 +443,7 @@ public class TestWorkflowExecutor {
         def.setWorkflowStatusListenerEnabled(true);
         workflow.setStatus(WorkflowModel.Status.RUNNING);
         workflowExecutor.completeWorkflow(workflow);
+        Thread.sleep(2000L);
         verify(workflowStatusListener, times(2))
                 .onWorkflowCompletedIfEnabled(any(WorkflowModel.class));
         verify(workflowStatusListener, times(0))
@@ -444,7 +452,7 @@ public class TestWorkflowExecutor {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testTerminateWorkflow() {
+    public void testTerminateWorkflow() throws Exception {
         WorkflowDef def = new WorkflowDef();
         def.setName("test");
 
@@ -499,6 +507,7 @@ public class TestWorkflowExecutor {
         def.setWorkflowStatusListenerEnabled(true);
         workflow.setStatus(WorkflowModel.Status.RUNNING);
         workflowExecutor.completeWorkflow(workflow);
+        Thread.sleep(2000L);
         verify(workflowStatusListener, times(1))
                 .onWorkflowCompletedIfEnabled(any(WorkflowModel.class));
         verify(workflowStatusListener, times(1))
